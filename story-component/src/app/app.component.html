@@ -1,0 +1,19 @@
+<div class="story-container" (swipeleft)="nextStory()" (swiperight)="prevStory()">
+  @for(story of stories; track story.id; let i = $index ) {
+    {{i}}
+    <div [class.active]="i === currentStoryIndex" class="story-content">
+      <!-- @if(story.type === 'image') { -->
+        <img [src]="story.content" >
+      <!-- } -->
+    </div>
+  }
+  
+  <div class="progress-bar-container">
+  @for(story of stories; track story.id; let i = $index ) {
+
+    <div  class="progress-bar" [style.width]="progressWidth + '%'"></div>
+  }
+  </div>
+  <button class="prev" (click)="prevStory()">Previous</button>
+  <button class="next" style="right: 1%;" (click)="nextStory()">Next</button>
+</div>
