@@ -1,6 +1,6 @@
 @for(person of persons; track person.id; let i=$index) {
 <div class="story-container" [class.active]="i === currentPersonIndex" (swipeleft)="nextPersonStory()" (swiperight)="prevPersonStory()">
-  {{i}}
+  {{person.name}}
   @for(story of person.stories; track story.id; let z = $index ) {
     <div [class.active]="z === currentStoryIndex" class="story-content">
       <!-- @if(story.type === 'image') { -->

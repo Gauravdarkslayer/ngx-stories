@@ -69,8 +69,8 @@ export class AppComponent {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     clearInterval(this.intervalId);
-    const stories = this.persons.find((person,index)=>)
-    this.currentStoryIndex = (this.currentStoryIndex + 1) % this.persons.length;
+    const stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+    this.currentStoryIndex = (this.currentStoryIndex + 1) % stories!.length;
     this.progressWidth = 0;
     setTimeout(() => {
       this.startStoryProgress();
@@ -85,7 +85,7 @@ export class AppComponent {
   nextPersonStory() {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
-    this.currentStoryIndex=0;
+    this.currentStoryIndex = 0;
     clearInterval(this.intervalId);
     this.currentPersonIndex = (this.currentPersonIndex + 1) % this.persons.length;
     this.progressWidth = 0;
@@ -98,7 +98,7 @@ export class AppComponent {
   prevPersonStory() {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
-    this.currentStoryIndex=0;
+    this.currentStoryIndex = 0;
     clearInterval(this.intervalId);
     this.currentPersonIndex = (this.currentPersonIndex - 1 + this.persons.length) % this.persons.length;
     this.progressWidth = 0;

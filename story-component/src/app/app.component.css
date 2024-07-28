@@ -8,14 +8,14 @@
 
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
-
-
+  display: none;
 }
 
 .story-container.active {
-    opacity: 1 !important;
-    position: relative;
-}
+    opacity: 1;
+    position: absolute;
+    display: block;
+  }
 
 .story-content {
   width: 100%;
