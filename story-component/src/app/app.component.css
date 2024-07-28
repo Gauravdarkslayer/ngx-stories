@@ -5,6 +5,16 @@
   margin: auto;
   overflow: hidden;
   border-radius: 10px;
+
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+
+
+}
+
+.story-container.active {
+    opacity: 1 !important;
+    position: relative;
 }
 
 .story-content {
