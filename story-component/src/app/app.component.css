@@ -72,3 +72,12 @@ button:nth-child(2) {
 button:nth-child(1) {
   left: 10px;
 }
+
+.progress-bar {
+  background-color: brown;
+  opacity:0.5;
+}
+
+.progress-bar.active {
+  opacity: 1
+}

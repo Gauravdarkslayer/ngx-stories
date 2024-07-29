@@ -38,13 +38,14 @@ export class AppComponent {
       stories: [
         { id: 1, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/4.jpg' },
         { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/5.jpg' },
-        { id: 3, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/6.jpg' }
+        { id: 3, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/6.jpg' },
+        { id: 4, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/7.jpg' }
       ]
     },
   ];
-  currentStoryIndex = 0;
-  currentPersonIndex = 0;
-  progressWidth = 0;
+  currentStoryIndex: number = 0;
+  currentPersonIndex: number = 0;
+  progressWidth: number = 0;
   intervalId: any;
   isTransitioning = false;
 
@@ -62,14 +63,20 @@ export class AppComponent {
       if (this.progressWidth >= 100) {
         this.nextStory();
       }
-    }, 100);
+    }, 50);
   }
 
   nextStory() {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     clearInterval(this.intervalId);
-    const stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+    let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+    console.log(stories?.length , this.currentStoryIndex);
+    
+    if (Number(stories?.length) - 1 === this.currentStoryIndex) {
+      this.currentPersonIndex = (this.currentPersonIndex + 1) % this.persons.length;
+      stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+    }
     this.currentStoryIndex = (this.currentStoryIndex + 1) % stories!.length;
     this.progressWidth = 0;
     setTimeout(() => {
@@ -114,5 +121,19 @@ export class AppComponent {
 
   onNextTap() {
 
+  }
+
+  getProgressWidth(storyIndex: number): string {
+    const stories = this.persons[this.currentPersonIndex].stories;
+    const percentage = (100 / stories.length);
+    const activeIndex = this.currentStoryIndex;
+
+    if (storyIndex < activeIndex) {
+      return '100%';
+    } else if (storyIndex === activeIndex) {
+      return `${percentage}%`;
+    } else {
+      return '0%';
+    }
   }
 }
