@@ -1,8 +1,10 @@
 @for(person of persons; track person.id; let i=$index) {
 <div class="story-container" [class.active]="i === currentPersonIndex" (swipeleft)="nextPersonStory()" (swiperight)="prevPersonStory()">
-  {{person.name}}
   @for(story of person.stories; track story.id; let z = $index ) {
     <div [class.active]="z === currentStoryIndex" class="story-content">
+      <h5>
+        {{person.name}}
+      </h5>
       <!-- @if(story.type === 'image') { -->
         <img [src]="story.content" >
       <!-- } -->
@@ -12,7 +14,6 @@
   <div class="progress-bar-container">
     @for(story of person.stories; track story.id; let x = $index ) {
       <div  class="progress-bar " [style.width]="progressWidth/3 + '%'" [class.active]="x===currentStoryIndex"></div>
-    <!-- <progress class="progress-bar" [value]="progressWidth/3" max="100" [class.active]="x===currentStoryIndex"></progress> -->
     }
   </div>
   @if(!(currentPersonIndex === 0 && currentStoryIndex === 0) ) {
@@ -22,7 +23,7 @@
 </div>
 }
 
-<div style="margin-top: 50px;">
+<!-- <div style="margin-top: 50px;">
   currentPersonIndex : {{progressWidth/3}}
 
-</div>
+</div> -->
