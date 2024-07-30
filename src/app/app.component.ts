@@ -71,13 +71,15 @@ export class AppComponent {
     this.isTransitioning = true;
     clearInterval(this.intervalId);
     let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
-    console.log(stories?.length , this.currentStoryIndex);
-    
+    console.log(stories?.length, this.currentStoryIndex);
+
     if (Number(stories?.length) - 1 === this.currentStoryIndex) {
       this.currentPersonIndex = (this.currentPersonIndex + 1) % this.persons.length;
       stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+      this.currentStoryIndex = 0;
+    } else {
+      this.currentStoryIndex = (this.currentStoryIndex + 1) % stories!.length;
     }
-    this.currentStoryIndex = (this.currentStoryIndex + 1) % stories!.length;
     this.progressWidth = 0;
     setTimeout(() => {
       this.startStoryProgress();
@@ -86,7 +88,28 @@ export class AppComponent {
   }
 
   prevStory() {
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
+    clearInterval(this.intervalId);
+    let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+    console.log(stories?.length, this.currentStoryIndex);
 
+    if (this.currentStoryIndex === 0) { 
+      this.currentPersonIndex --;
+      stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+      this.currentStoryIndex = Number(stories?.length) - 1;
+    } else {
+      this.currentStoryIndex = (this.currentStoryIndex - 1) % this.persons.length;
+      stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+    }
+    
+    // this.currentStoryIndex--;
+    // }
+    this.progressWidth = 0;
+    setTimeout(() => {
+      this.startStoryProgress();
+      this.isTransitioning = false;
+    }, 500); // Match this timeout with the CSS transition duration
   }
 
   nextPersonStory() {
@@ -135,5 +158,9 @@ export class AppComponent {
     } else {
       return '0%';
     }
+  }
+
+  onEnd() {
+    alert('End');
   }
 }

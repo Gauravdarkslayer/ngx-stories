@@ -12,9 +12,17 @@
   <div class="progress-bar-container">
     @for(story of person.stories; track story.id; let x = $index ) {
       <div  class="progress-bar " [style.width]="progressWidth/3 + '%'" [class.active]="x===currentStoryIndex"></div>
+    <!-- <progress class="progress-bar" [value]="progressWidth/3" max="100" [class.active]="x===currentStoryIndex"></progress> -->
     }
   </div>
-  <button class="prev" (click)="prevStory()">Previous</button>
-  <button class="next" style="right: 1%;" (click)="nextStory()">Next</button>
+  @if(!(currentPersonIndex === 0 && currentStoryIndex === 0) ) {
+    <button class="prev" (click)="prevStory()">Previous</button>
+  }
+<button class="next" style="right: 1%;" (click)="nextStory()">Next</button>
 </div>
 }
+
+<div style="margin-top: 50px;">
+  currentPersonIndex : {{progressWidth/3}}
+
+</div>
