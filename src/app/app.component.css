@@ -73,11 +73,71 @@ button:nth-child(1) {
   left: 10px;
 }
 
-.progress-bar {
-  background-color: brown;
-  opacity:0.5;
+.progress-bar-container {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
 }
 
-.progress-bar.active {
-  opacity: 1
+progress {
+  width: 20%;
+  height: 4px;
+  appearance: none;
+}
+
+progress::-webkit-progress-bar {
+  background-color: lightgrey;
+}
+
+progress::-webkit-progress-value {
+  background-color: green;
+}
+
+progress::-moz-progress-bar {
+  background-color: green;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.story-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease-in-out;
+}
+
+.story-container.active {
+  display: block;
+}
+
+.story-container.swipe-left {
+  transform: rotateY(-90deg);
+}
+
+.story-container.swipe-right {
+  transform: rotateY(90deg);
+}
+.story-content.active {
+  display: block;
+  transform: rotateY(0deg);
+}
+
+.story-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  transition: transform 0.6s ease-in-out;
 }

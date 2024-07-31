@@ -1,4 +1,4 @@
-import { Component, Injectable } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Injectable, QueryList, Renderer2, ViewChildren } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule } from '@angular/platform-browser';
 declare var Hammer: any;
@@ -13,14 +13,14 @@ export class MyHammerConfig extends HammerGestureConfig {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, HammerModule],
   providers: [
     { provide: HAMMER_GESTURE_CONFIG, useClass: MyHammerConfig }
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   title = 'story-component';
   readonly persons = [
     {
@@ -48,13 +48,25 @@ export class AppComponent {
   progressWidth: number = 0;
   intervalId: any;
   isTransitioning = false;
+  isSwipingLeft = false;
+  isSwipingRight = false;
+  @ViewChildren('storyContainer') storyContainers!: QueryList<ElementRef>;
+
+  constructor(
+    private renderer: Renderer2
+  ) { }
 
   ngOnInit(): void {
     this.startStoryProgress();
+
   }
 
   ngOnDestroy(): void {
     clearInterval(this.intervalId);
+  }
+
+  ngAfterViewInit(): void {
+    this.initHammer();
   }
 
   startStoryProgress() {
@@ -64,6 +76,35 @@ export class AppComponent {
         this.nextStory();
       }
     }, 50);
+  }
+
+  initHammer() {
+    this.storyContainers?.forEach(storyContainer => {
+      const hammer = new Hammer(storyContainer.nativeElement);
+      hammer.on('swipeleft', () => this.handleSwipe('left'));
+      hammer.on('swiperight', () => this.handleSwipe('right'));
+    });
+  }
+
+  handleSwipe(direction: string) {
+    if (direction === 'left') {
+      this.isSwipingLeft = true;
+      setTimeout(() => {
+        this.nextPersonStory();
+        this.resetSwipe();
+      }, 600); // Match the animation duration
+    } else if (direction === 'right') {
+      this.isSwipingRight = true;
+      setTimeout(() => {
+        this.prevPersonStory();
+        this.resetSwipe();
+      }, 600); // Match the animation duration
+    }
+  }
+
+  resetSwipe() {
+    this.isSwipingLeft = false;
+    this.isSwipingRight = false;
   }
 
   nextStory() {
@@ -94,15 +135,15 @@ export class AppComponent {
     let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
     console.log(stories?.length, this.currentStoryIndex);
 
-    if (this.currentStoryIndex === 0) { 
-      this.currentPersonIndex --;
+    if (this.currentStoryIndex === 0) {
+      this.currentPersonIndex--;
       stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
       this.currentStoryIndex = Number(stories?.length) - 1;
     } else {
       this.currentStoryIndex = (this.currentStoryIndex - 1) % this.persons.length;
       stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
     }
-    
+
     // this.currentStoryIndex--;
     // }
     this.progressWidth = 0;
@@ -146,17 +187,13 @@ export class AppComponent {
 
   }
 
-  getProgressWidth(storyIndex: number): string {
-    const stories = this.persons[this.currentPersonIndex].stories;
-    const percentage = (100 / stories.length);
-    const activeIndex = this.currentStoryIndex;
-
-    if (storyIndex < activeIndex) {
-      return '100%';
-    } else if (storyIndex === activeIndex) {
-      return `${percentage}%`;
+  getProgressValue(storyIndex: number): number {
+    if (storyIndex < this.currentStoryIndex) {
+      return 100;
+    } else if (storyIndex === this.currentStoryIndex) {
+      return this.progressWidth;
     } else {
-      return '0%';
+      return 0;
     }
   }
 
