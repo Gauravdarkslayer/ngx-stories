@@ -50,6 +50,7 @@ export class AppComponent implements AfterViewInit {
   isTransitioning = false;
   isSwipingLeft = false;
   isSwipingRight = false;
+  isHolding = false;
   @ViewChildren('storyContainer') storyContainers!: QueryList<ElementRef>;
 
   constructor(
@@ -70,6 +71,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   startStoryProgress() {
+    this.intervalId && clearInterval(this.intervalId);
     this.intervalId = setInterval(() => {
       this.progressWidth += 1;
       if (this.progressWidth >= 100) {
@@ -179,15 +181,8 @@ export class AppComponent implements AfterViewInit {
     }, 500); // Match this timeout with the CSS transition duration
   }
 
-  onPreviousTap() {
-
-  }
-
-  onNextTap() {
-
-  }
-
   getProgressValue(storyIndex: number): number {
+    if(this.isHolding) return this.progressWidth;
     if (storyIndex < this.currentStoryIndex) {
       return 100;
     } else if (storyIndex === this.currentStoryIndex) {
@@ -195,6 +190,20 @@ export class AppComponent implements AfterViewInit {
     } else {
       return 0;
     }
+  }
+
+  onHold() {
+    this.isHolding = true;
+    clearInterval(this.intervalId);
+  }
+
+  onRelease() {
+    this.isHolding = false;
+    this.startStoryProgress();
+  }
+
+  disableContextMenu(event: MouseEvent) {
+    event.preventDefault();
   }
 
   onEnd() {

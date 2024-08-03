@@ -1,22 +1,27 @@
 @for(person of persons; track person.id; let i=$index) {
 <div class="story-container" #storyContainer [class.active]="i === currentPersonIndex"
-[class.swipe-left]="isSwipingLeft" 
-[class.swipe-right]="isSwipingRight"
+  [class.swipe-left]="isSwipingLeft" 
+  [class.swipe-right]="isSwipingRight"
+  (mousedown)="onHold()"
+  (mouseup)="onRelease()"
+  (touchstart)="onHold()"
+  (touchend)="onRelease()"
+  (contextmenu)="disableContextMenu($event)"
 >
   @for(story of person.stories; track story.id; let z = $index ) {
     <div [class.active]="z === currentStoryIndex" class="story-content">
-      <h5>
-        {{person.name}}
-      </h5>
+        <h5 [style.visibility]="isHolding ? 'hidden' : 'visible'">
+          {{person.name}}
+        </h5>
         <img [src]="story.content" >
     </div>
   }
   
-  <div class="progress-bar-container">
+  <div class="progress-bar-container" [style.visibility]="isHolding ? 'hidden' : 'visible'">
     @for(story of person.stories; track story.id; let x = $index ) {
-      <progress  class="progress-bar "
-      [value]="getProgressValue(x)" 
-                max="100" [class.active]="x===currentStoryIndex"></progress>
+        <progress  class="progress-bar "
+        [value]="getProgressValue(x)" 
+                  max="100" [class.active]="x===currentStoryIndex"></progress>
     }
   </div>
   @if(!(currentPersonIndex === 0 && currentStoryIndex === 0) ) {
