@@ -131,7 +131,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   prevStory() {
-    if (this.isTransitioning) return;
+      if (this.isTransitioning) return;
     this.isTransitioning = true;
     clearInterval(this.intervalId);
     let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
@@ -146,8 +146,6 @@ export class AppComponent implements AfterViewInit {
       stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
     }
 
-    // this.currentStoryIndex--;
-    // }
     this.progressWidth = 0;
     setTimeout(() => {
       this.startStoryProgress();
@@ -182,7 +180,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   getProgressValue(storyIndex: number): number {
-    if(this.isHolding) return this.progressWidth;
+    if (this.isHolding) return this.progressWidth;
     if (storyIndex < this.currentStoryIndex) {
       return 100;
     } else if (storyIndex === this.currentStoryIndex) {
