@@ -1,22 +1,11 @@
-import { AfterViewInit, Component, ElementRef, Injectable, QueryList, Renderer2, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule } from '@angular/platform-browser';
-declare var Hammer: any;
-
-@Injectable()
-export class MyHammerConfig extends HammerGestureConfig {
-  override overrides = {
-    swipe: { direction: Hammer.DIRECTION_HORIZONTAL },
-  };
-}
+import { HammerModule } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, HammerModule],
-  providers: [
-    { provide: HAMMER_GESTURE_CONFIG, useClass: MyHammerConfig }
-  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
@@ -54,7 +43,6 @@ export class AppComponent implements AfterViewInit {
   @ViewChildren('storyContainer') storyContainers!: QueryList<ElementRef>;
 
   constructor(
-    private renderer: Renderer2
   ) { }
 
   ngOnInit(): void {
@@ -83,8 +71,11 @@ export class AppComponent implements AfterViewInit {
   initHammer() {
     this.storyContainers?.forEach(storyContainer => {
       const hammer = new Hammer(storyContainer.nativeElement);
+      hammer.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
       hammer.on('swipeleft', () => this.handleSwipe('left'));
       hammer.on('swiperight', () => this.handleSwipe('right'));
+      hammer.on('swipedown', () => this.handleSwipe('down'));
+      hammer.on('swipeup', () => this.handleSwipe('up'));
     });
   }
 
@@ -92,6 +83,11 @@ export class AppComponent implements AfterViewInit {
     if (direction === 'left') {
       this.isSwipingLeft = true;
       setTimeout(() => {
+        if (this.currentPersonIndex === this.persons.length - 1) {
+          let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+          this.currentStoryIndex = Number(stories?.length) - 1;
+          if (this.checkEnd()) return;
+        }
         this.nextPersonStory();
         this.resetSwipe();
       }, 600); // Match the animation duration
@@ -101,6 +97,11 @@ export class AppComponent implements AfterViewInit {
         this.prevPersonStory();
         this.resetSwipe();
       }, 600); // Match the animation duration
+    } else if (direction === 'down') {
+      clearInterval(this.intervalId);
+      this.onExit();
+    } else if (direction === 'up') {
+      this.onSwipeUpTriggered();
     }
   }
 
@@ -113,8 +114,8 @@ export class AppComponent implements AfterViewInit {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     clearInterval(this.intervalId);
+    if (this.checkEnd()) return;
     let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
-    console.log(stories?.length, this.currentStoryIndex);
 
     if (Number(stories?.length) - 1 === this.currentStoryIndex) {
       this.currentPersonIndex = (this.currentPersonIndex + 1) % this.persons.length;
@@ -131,11 +132,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   prevStory() {
-      if (this.isTransitioning) return;
+    if (this.isTransitioning) return;
     this.isTransitioning = true;
     clearInterval(this.intervalId);
     let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
-    console.log(stories?.length, this.currentStoryIndex);
 
     if (this.currentStoryIndex === 0) {
       this.currentPersonIndex--;
@@ -156,9 +156,10 @@ export class AppComponent implements AfterViewInit {
   nextPersonStory() {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
+    this.currentPersonIndex = (this.currentPersonIndex + 1) % this.persons.length;
+    if (this.checkEnd()) return;
     this.currentStoryIndex = 0;
     clearInterval(this.intervalId);
-    this.currentPersonIndex = (this.currentPersonIndex + 1) % this.persons.length;
     this.progressWidth = 0;
     setTimeout(() => {
       this.startStoryProgress();
@@ -171,12 +172,23 @@ export class AppComponent implements AfterViewInit {
     this.isTransitioning = true;
     this.currentStoryIndex = 0;
     clearInterval(this.intervalId);
-    this.currentPersonIndex = (this.currentPersonIndex - 1 + this.persons.length) % this.persons.length;
+    if (this.currentPersonIndex !== 0 && this.persons.length > this.currentPersonIndex) {
+      this.currentPersonIndex--;
+    }
     this.progressWidth = 0;
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
     }, 500); // Match this timeout with the CSS transition duration
+  }
+
+  checkEnd(): boolean {
+    let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+    if (this.currentStoryIndex === Number(stories?.length) - 1 && this.currentPersonIndex === this.persons.length - 1) {
+      this.onEnd();
+      return true;
+    }
+    return false;
   }
 
   getProgressValue(storyIndex: number): number {
@@ -206,5 +218,13 @@ export class AppComponent implements AfterViewInit {
 
   onEnd() {
     alert('End');
+  }
+
+  onExit() {
+    alert('Exit');
+  }
+
+  onSwipeUpTriggered() {
+    alert('Swipe Up Triggered');
   }
 }
