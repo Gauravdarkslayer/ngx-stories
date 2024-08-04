@@ -7,8 +7,10 @@
   border-radius: 10px;
 
   opacity: 0;
-  transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.6s ease-in-out;
   display: none;
+  height: 100%;
+
 }
 
 .story-container.active {
@@ -55,6 +57,7 @@ button {
   font-size: 1.5rem;
   cursor: pointer;
   z-index: 10;
+  height: 100vh;
 }
 
 button:focus {
@@ -98,17 +101,6 @@ progress::-webkit-progress-value {
 progress::-moz-progress-bar {
   background-color: green;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 .story-container {
