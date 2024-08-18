@@ -135,23 +135,28 @@ export class AppComponent implements AfterViewInit {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     clearInterval(this.intervalId);
-    let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
-
+  
+    let stories = this.persons[this.currentPersonIndex]?.stories;
+  
     if (this.currentStoryIndex === 0) {
-      this.currentPersonIndex--;
-      stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
-      this.currentStoryIndex = Number(stories?.length) - 1;
+      // Move to the previous person if the current story index is 0
+      if (this.currentPersonIndex > 0) {
+        this.currentPersonIndex--;
+        stories = this.persons[this.currentPersonIndex]?.stories;
+        this.currentStoryIndex = stories?.length ? stories.length - 1 : 0;
+      }
     } else {
-      this.currentStoryIndex = (this.currentStoryIndex - 1) % this.persons.length;
-      stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+      // Otherwise, just move to the previous story within the same person
+      this.currentStoryIndex--;
     }
-
+  
     this.progressWidth = 0;
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
     }, 500); // Match this timeout with the CSS transition duration
   }
+  
 
   nextPersonStory() {
     if (this.isTransitioning) return;
