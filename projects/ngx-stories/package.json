@@ -1,0 +1,13 @@
+{
+  "name": "ngx-stories",
+  "version": "0.0.2",
+  "peerDependencies": {
+    "@angular/common": "^18.2.0",
+    "@angular/core": "^18.2.0",
+    "hammerjs": "^2.0.8"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}
