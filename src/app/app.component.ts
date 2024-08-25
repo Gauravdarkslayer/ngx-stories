@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { Component } from '@angular/core';
 import { NgxStoriesComponent } from '../../projects/ngx-stories/src/public-api';
 
 @Component({
@@ -9,5 +9,25 @@ import { NgxStoriesComponent } from '../../projects/ngx-stories/src/public-api';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  
+  readonly persons = [
+    {
+      id: 1,
+      name: 'Gaurav',
+      stories: [
+        { id: 1, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/1.jpg' },
+        { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg' },
+        { id: 3, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
+      ]
+    },
+    {
+      id: 2,
+      name: 'Rajesh',
+      stories: [
+        { id: 1, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/4.jpg' },
+        { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/5.jpg' },
+        { id: 3, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/6.jpg' },
+        { id: 4, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/7.jpg' }
+      ]
+    },
+  ];
 }

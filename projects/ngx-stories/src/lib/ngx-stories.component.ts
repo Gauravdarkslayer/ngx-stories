@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, QueryList, ViewChildren } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
-// import Hammer from "hammerjs";
-declare var Hammer: any;
+import { Person } from '../lib/interfaces/interfaces';
+import "hammerjs";
+
 @Component({
   selector: 'ngx-stories',
   standalone: true,
@@ -10,29 +11,10 @@ declare var Hammer: any;
   templateUrl: './ngx-stories.component.html',
   styleUrl: './ngx-stories.component.scss',
 })
-export class NgxStoriesComponent implements AfterViewInit  {
+export class NgxStoriesComponent implements AfterViewInit {
   title = 'story-component';
-  readonly persons = [
-    {
-      id: 1,
-      name: 'Gaurav',
-      stories: [
-        { id: 1, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/1.jpg' },
-        { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg' },
-        { id: 3, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Rajesh',
-      stories: [
-        { id: 1, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/4.jpg' },
-        { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/5.jpg' },
-        { id: 3, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/6.jpg' },
-        { id: 4, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/7.jpg' }
-      ]
-    },
-  ];
+  @Input({ required: true }) persons: Person[] = [];
+
   currentStoryIndex: number = 0;
   currentPersonIndex: number = 0;
   progressWidth: number = 0;
@@ -136,9 +118,9 @@ export class NgxStoriesComponent implements AfterViewInit  {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     clearInterval(this.intervalId);
-  
+
     let stories = this.persons[this.currentPersonIndex]?.stories;
-  
+
     if (this.currentStoryIndex === 0) {
       // Move to the previous person if the current story index is 0
       if (this.currentPersonIndex > 0) {
@@ -150,14 +132,14 @@ export class NgxStoriesComponent implements AfterViewInit  {
       // Otherwise, just move to the previous story within the same person
       this.currentStoryIndex--;
     }
-  
+
     this.progressWidth = 0;
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
     }, 500); // Match this timeout with the CSS transition duration
   }
-  
+
 
   nextPersonStory() {
     if (this.isTransitioning) return;
