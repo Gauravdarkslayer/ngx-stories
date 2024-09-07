@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
 import { Person } from '../lib/interfaces/interfaces';
@@ -14,6 +14,9 @@ import "hammerjs";
 export class NgxStoriesComponent implements AfterViewInit {
   title = 'story-component';
   @Input({ required: true }) persons: Person[] = [];
+  @Output() triggerOnEnd = new EventEmitter<void>();
+  @Output() triggerOnExit = new EventEmitter<void>();
+  @Output() triggerOnSwipeUp = new EventEmitter<void>();
 
   currentStoryIndex: number = 0;
   currentPersonIndex: number = 0;
@@ -23,6 +26,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   isSwipingLeft = false;
   isSwipingRight = false;
   isHolding = false;
+  holdTimeout: any;
   @ViewChildren('storyContainer') storyContainers!: QueryList<ElementRef>;
 
   constructor(
@@ -30,7 +34,6 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   ngOnInit(): void {
     this.startStoryProgress();
-
   }
 
   ngOnDestroy(): void {
@@ -97,7 +100,10 @@ export class NgxStoriesComponent implements AfterViewInit {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     clearInterval(this.intervalId);
-    if (this.checkEnd()) return;
+    if (this.checkEnd()) { 
+      this.isTransitioning = false; 
+      return;
+    }
     let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
 
     if (Number(stories?.length) - 1 === this.currentStoryIndex) {
@@ -190,6 +196,12 @@ export class NgxStoriesComponent implements AfterViewInit {
     }
   }
 
+  onTouchStart() {
+    this.holdTimeout = setTimeout(() => {
+      this.onHold();
+    }, 500);  // 500ms delay
+  }
+
   onHold() {
     this.isHolding = true;
     clearInterval(this.intervalId);
@@ -197,6 +209,7 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   onRelease() {
     this.isHolding = false;
+    clearTimeout(this.holdTimeout);  // Cancel hold if user releases before 1 second
     this.startStoryProgress();
   }
 
@@ -204,15 +217,20 @@ export class NgxStoriesComponent implements AfterViewInit {
     event.preventDefault();
   }
 
+  pause() {
+    clearInterval(this.intervalId);
+  }
+
   onEnd() {
-    alert('End');
+    this.triggerOnEnd.emit();
   }
 
   onExit() {
-    alert('Exit');
+    // Swipe down event
+    this.triggerOnExit.emit();
   }
 
   onSwipeUpTriggered() {
-    alert('Swipe Up Triggered');
+    this.triggerOnSwipeUp.emit();
   }
 }

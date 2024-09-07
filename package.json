@@ -8,8 +8,10 @@
     "build-library": "ng build ngx-stories",
     "pack-lib": "cd dist/ngx-stories && npm pack",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "publish": "npm run build-library && npm run pack-lib && cd dist/ngx-stories && npm publish --access public"
+    "test": "ng test ngx-stories",
+    "publish": "npm run build-library && npm run pack-lib && cd dist/ngx-stories && npm publish --access public",
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix"
   },
   "private": true,
   "dependencies": {
@@ -21,17 +23,25 @@
     "@angular/platform-browser": "^18.2.0",
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
+    "hammerjs": "^2.0.8",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.14.10",
-    "hammerjs": "^2.0.8"
+    "zone.js": "~0.14.10"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.1",
+    "@angular-eslint/builder": "18.3.0",
+    "@angular-eslint/eslint-plugin": "18.3.0",
+    "@angular-eslint/eslint-plugin-template": "18.3.0",
+    "@angular-eslint/schematics": "18.3.0",
+    "@angular-eslint/template-parser": "18.3.0",
     "@angular/cli": "^18.2.1",
     "@angular/compiler-cli": "^18.2.0",
     "@types/hammerjs": "^2.0.45",
     "@types/jasmine": "~5.1.0",
+    "@typescript-eslint/eslint-plugin": "7.11.0",
+    "@typescript-eslint/parser": "7.11.0",
+    "eslint": "8.57.0",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
