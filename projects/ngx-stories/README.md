@@ -1,24 +1,58 @@
-# NgxStories
+# Ngx Stories
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.0.
+An Angular library for displaying user stories in a carousel format.
 
-## Code scaffolding
 
-Run `ng generate component component-name --project ngx-stories` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ngx-stories`.
-> Note: Don't forget to add `--project ngx-stories` or else it will be added to the default project in your `angular.json` file. 
+## For Version 17+
 
-## Build
+## Installation
 
-Run `ng build ngx-stories` to build the project. The build artifacts will be stored in the `dist/` directory.
+Install the library via npm:
 
-## Publishing
+```bash
+npm install ngx-stories
+```
 
-After building your library with `ng build ngx-stories`, go to the dist folder `cd dist/ngx-stories` and run `npm publish`.
+```ts
+import { NgxStoriesComponent } from 'ngx-stories';
 
-## Running unit tests
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [NgxStoriesComponent],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css'
+})
+export class AppComponent {
+  persons = [
+      {
+        id: 1,
+        name: 'John Doe',
+        stories: [
+          { id: 101, type: 'image', content: 'https://example.com/story1.jpg' },
+        ],
+      },
+      {
+        id: 2,
+        name: 'Jane Smith',
+        stories: [
+          { id: 103, type: 'image', content: 'https://example.com/story3.jpg' },
+        ],
+      },
+    ];
+  }
+```
 
-Run `ng test ngx-stories` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```html
+<ngx-stories [persons]="persons"></ngx-stories>
+```
 
-## Further help
+## Features
+* Dynamic Story Carousel: Display a collection of stories for each person.
+* Easy Integration: Simple and straightforward to integrate into your Angular project.
+* Story Progress Tracker: Track the progress of each story as the user navigates through the stories.
+* Swipe Gestures (Mobile Friendly): Allow users to swipe left or right to navigate through the stories.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+
