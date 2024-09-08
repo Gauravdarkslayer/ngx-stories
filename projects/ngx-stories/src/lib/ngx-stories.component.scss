@@ -1,135 +1,162 @@
 .story-container {
-    position: relative;
-    width: 100%;
-    max-width: 500px;
-    margin: auto;
-    overflow: hidden;
-    border-radius: 10px;
-  
-    opacity: 0;
-    transition: opacity 0.6s ease-in-out;
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  overflow: hidden;
+  border-radius: 10px;
+
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+  display: none;
+  height: 100%;
+
+}
+
+.story-container.active {
+  opacity: 1;
+  position: absolute;
+  display: block;
+}
+
+.story-content {
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.story-content.active {
+  opacity: 1;
+  position: relative;
+}
+
+.progress-bar-container {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 5px;
+  height: 1vh;
+}
+
+.progress-bar {
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.progress-bar {
+  width: 100%; /* Adjust the width as needed */
+  background-color: rgba(128, 128, 128, 0.705); /* Background color for the progress bar */
+  border-radius: 5px; /* Optional: for rounded corners */
+  overflow: hidden;
+}
+
+.progress-bar::-webkit-progress-bar {
+  background-color: rgba(128, 128, 128, 0.767); /* Background for the progress bar */
+}
+
+.progress-bar::-webkit-progress-value {
+  background-color: rgba(255, 255, 255, 0.76); /* Foreground color (the actual progress) */
+}
+
+.progress-bar::-moz-progress-bar {
+  background-color: rgba(255, 255, 255, 0.76); /* Foreground color for Firefox */
+}
+
+.progress-bar::-ms-fill {
+  background-color: rgba(255, 255, 255, 0.76); /* Foreground color for Internet Explorer/Edge */
+}
+
+
+button {
+  position: absolute;
+  top: 20%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10;
+  height: 100vh;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:hover {
+  color: lightgrey;
+}
+
+button:nth-child(2) {
+  right: 10px;
+}
+
+button:nth-child(1) {
+  left: 10px;
+}
+
+progress {
+  width: 20%;
+  height: 4px;
+  appearance: none;
+}
+
+.story-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease-in-out;
+}
+
+.story-container.active {
+  display: block;
+}
+
+.story-container.swipe-left {
+  transform: rotateY(-90deg);
+}
+
+.story-container.swipe-right {
+  transform: rotateY(90deg);
+}
+
+.story-content.active {
+  display: block;
+  transform: rotateY(0deg);
+}
+
+.story-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  transition: transform 0.6s ease-in-out;
+}
+
+.prev, .next {
+  opacity: 0;
+  top: 50%;
+  max-height: 80vh;
+}
+
+.story-content-container {
+  display: flex;
+  button {
+    top: 5% !important;
     display: none;
-    height: 100%;
-  
   }
-  
-  .story-container.active {
-      opacity: 1;
-      position: absolute;
+}
+
+@media (min-width: 768px) {
+  .story-content-container {
+    button {
       display: block;
     }
-  
-  .story-content {
-    width: 100%;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    position: absolute;
-    top: 0;
-    left: 0;
   }
-  
-  .story-content.active {
-    opacity: 1;
-    position: relative;
-  }
-  
-  .progress-bar-container {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-    padding: 5px;
-  }
-  
-  .progress-bar {
-    height: 3px;
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-  
-  button {
-    position: absolute;
-    top: 20%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-    z-index: 10;
-    height: 100vh;
-  }
-  
-  button:focus {
-    outline: none;
-  }
-  
-  button:hover {
-    color: lightgrey;
-  }
-  
-  button:nth-child(2) {
-    right: 10px;
-  }
-  
-  button:nth-child(1) {
-    left: 10px;
-  }
-  
-  .progress-bar-container {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  progress {
-    width: 20%;
-    height: 4px;
-    appearance: none;
-  }
-  
-  progress::-webkit-progress-bar {
-    background-color: lightgrey;
-  }
-  
-  progress::-webkit-progress-value {
-    background-color: green;
-  }
-  
-  progress::-moz-progress-bar {
-    background-color: green;
-  }
-  
-  
-  .story-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.6s ease-in-out;
-  }
-  
-  .story-container.active {
-    display: block;
-  }
-  
-  .story-container.swipe-left {
-    transform: rotateY(-90deg);
-  }
-  
-  .story-container.swipe-right {
-    transform: rotateY(90deg);
-  }
-  .story-content.active {
-    display: block;
-    transform: rotateY(0deg);
-  }
-  
-  .story-content {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    transition: transform 0.6s ease-in-out;
-  }
+}

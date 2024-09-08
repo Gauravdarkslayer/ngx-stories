@@ -30,4 +30,12 @@ export class AppComponent {
       ]
     },
   ];
+
+  triggerOnEnd() {
+    alert('End');
+  }
+
+  triggerOnExit() {
+    alert('Exit');
+  }
 }
