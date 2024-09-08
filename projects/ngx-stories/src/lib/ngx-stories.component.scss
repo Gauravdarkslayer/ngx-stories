@@ -149,5 +149,14 @@ progress {
   display: flex;
   button {
     top: 5% !important;
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .story-content-container {
+    button {
+      display: block;
+    }
   }
 }

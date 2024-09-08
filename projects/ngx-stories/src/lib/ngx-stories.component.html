@@ -14,8 +14,8 @@
           <h5 [style.visibility]="isHolding ? 'hidden' : 'visible'">
             {{person.name}}
           </h5>
-          <button (click)="pause()" style="height: 10%; background-color: red;">
-            <img src="assets/images/pause.png" alt="pause"> 
+          <button (click)="togglePause()">
+            <img [src]="toggleBtnImg" alt="pause" width="20" height="20"> 
           </button>
         </div>  
 
