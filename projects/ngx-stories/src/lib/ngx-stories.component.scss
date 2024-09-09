@@ -1,7 +1,7 @@
 .story-container {
   position: relative;
-  width: 100%;
-  max-width: 500px;
+  width: 100vw;
+  max-width: 100vw;
   margin: auto;
   overflow: hidden;
   border-radius: 10px;
@@ -49,26 +49,30 @@
 }
 
 .progress-bar {
-  width: 100%; /* Adjust the width as needed */
-  background-color: rgba(128, 128, 128, 0.705); /* Background color for the progress bar */
-  border-radius: 5px; /* Optional: for rounded corners */
+  width: 100%;
+  background-color: rgba(128, 128, 128, 0.705);
+  border-radius: 5px;
   overflow: hidden;
 }
 
 .progress-bar::-webkit-progress-bar {
-  background-color: rgba(128, 128, 128, 0.767); /* Background for the progress bar */
+  background-color: rgba(128, 128, 128, 0.767);
+  /* Background for the progress bar */
 }
 
 .progress-bar::-webkit-progress-value {
-  background-color: rgba(255, 255, 255, 0.76); /* Foreground color (the actual progress) */
+  background-color: rgba(255, 255, 255, 0.76);
+  /* Foreground color (the actual progress) */
 }
 
 .progress-bar::-moz-progress-bar {
-  background-color: rgba(255, 255, 255, 0.76); /* Foreground color for Firefox */
+  background-color: rgba(255, 255, 255, 0.76);
+  /* Foreground color for Firefox */
 }
 
 .progress-bar::-ms-fill {
-  background-color: rgba(255, 255, 255, 0.76); /* Foreground color for Internet Explorer/Edge */
+  background-color: rgba(255, 255, 255, 0.76);
+  /* Foreground color for Internet Explorer/Edge */
 }
 
 
@@ -127,19 +131,21 @@ progress {
 }
 
 .story-content.active {
-  display: block;
   transform: rotateY(0deg);
 }
 
 .story-content {
+  display: flex;
   position: absolute;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  flex-direction: column;
   backface-visibility: hidden;
   transition: transform 0.6s ease-in-out;
 }
 
-.prev, .next {
+.prev,
+.next {
   opacity: 0;
   top: 50%;
   max-height: 80vh;
@@ -147,9 +153,26 @@ progress {
 
 .story-content-container {
   display: flex;
+  flex-shrink: 0;
+  padding: 10px;
+  position: absolute;
   button {
     top: 5% !important;
     display: none;
+  }
+}
+
+.story-image-container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
   }
 }
 
