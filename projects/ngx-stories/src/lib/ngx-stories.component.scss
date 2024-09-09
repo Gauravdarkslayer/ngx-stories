@@ -155,9 +155,9 @@ progress {
   display: flex;
   flex-shrink: 0;
   padding: 10px;
-  position: absolute;
+  justify-content: space-between;
+  align-items: center;
   button {
-    top: 5% !important;
     display: none;
   }
 }
@@ -179,7 +179,9 @@ progress {
 @media (min-width: 768px) {
   .story-content-container {
     button {
+      position: relative;
       display: block;
+      height: fit-content;
     }
   }
 }
