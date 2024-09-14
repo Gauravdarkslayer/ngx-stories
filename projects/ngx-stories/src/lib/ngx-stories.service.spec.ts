@@ -1,16 +1,16 @@
-// import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
-// import { NgxStoriesService } from './ngx-stories.service';
+import { NgxStoriesService } from './ngx-stories.service';
 
-// describe('NgxStoriesService', () => {
-//   let service: NgxStoriesService;
+describe('NgxStoriesService', () => {
+  let service: NgxStoriesService;
 
-//   beforeEach(() => {
-//     TestBed.configureTestingModule({});
-//     service = TestBed.inject(NgxStoriesService);
-//   });
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(NgxStoriesService);
+  });
 
-//   it('should be created', () => {
-//     expect(service).toBeTruthy();
-//   });
-// });
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});

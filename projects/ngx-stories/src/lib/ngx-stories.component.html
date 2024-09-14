@@ -15,7 +15,7 @@
             {{person.name}}
           </h5>
           <button (click)="togglePause()">
-            <img [src]="toggleBtnImg" alt="pause" width="20" height="20"> 
+            <img [ngClass]="{ 'pause-icon': isPaused, 'play-icon': !isPaused }" alt="pause" width="20" height="20"> 
           </button>
         </div>  
         <div class="story-image-container">

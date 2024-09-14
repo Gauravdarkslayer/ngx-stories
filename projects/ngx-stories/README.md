@@ -53,6 +53,7 @@ export class AppComponent {
 * Story Progress Tracker: Track the progress of each story as the user navigates through the stories.
 * Swipe Gestures (Mobile Friendly): Allow users to swipe left or right to navigate through the stories.
 * Hold to Pause: Pause the story progress when the user holds their finger on the screen.
+* Events: Trigger events when the user reaches the end of the stories or when they exit the carousel.
 
 
 
