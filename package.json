@@ -9,9 +9,10 @@
     "pack-lib": "cd dist/ngx-stories && npm pack",
     "watch": "ng build --watch --configuration development",
     "test": "ng test ngx-stories",
-    "publish": "npm run build-library && npm run pack-lib && cd dist/ngx-stories && npm publish --access public",
+    "publish": "npm run build-library && npm run postbuild-library && npm run pack-lib && cd dist/ngx-stories && npm publish --access public",
     "lint": "ng lint",
-    "lint:fix": "ng lint --fix"
+    "lint:fix": "ng lint --fix",
+    "postbuild-library": "cpy README.md LICENSE dist"
   },
   "private": true,
   "dependencies": {
@@ -49,6 +50,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^18.2.0",
-    "typescript": "~5.5.2"
+    "typescript": "~5.5.2",
+    "cpy-cli": "4.2.0"
   }
 }

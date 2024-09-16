@@ -52,7 +52,8 @@ export class AppComponent {
 * Easy Integration: Simple and straightforward to integrate into your Angular project.
 * Story Progress Tracker: Track the progress of each story as the user navigates through the stories.
 * Swipe Gestures (Mobile Friendly): Allow users to swipe left or right to navigate through the stories.
-
+* Hold to Pause: Pause the story progress when the user holds their finger on the screen.
+* Events: Trigger events when the user reaches the end of the stories or when they exit the carousel.
 
 ## License
 This library is licensed under the MIT License. Feel free to use and modify the code as per your needs.
