@@ -1,11 +1,12 @@
+export type StoryType = 'image' | 'video';
 export interface Story {
     id: number,
-    type: String,
-    content: String,
+    type: StoryType,
+    content: string,
 }
 
 export interface Person {
-    id: number,
-    name: String,
-    stories: Story[]
+    id: number, // unique id
+    name: string, // name of the person which is to be displayed over story
+    stories: Story[] // array of stories
 }

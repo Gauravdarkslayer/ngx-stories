@@ -4,6 +4,7 @@ import { HammerModule } from '@angular/platform-browser';
 import { Person } from '../lib/interfaces/interfaces';
 import "hammerjs";
 import { CommonModule } from '@angular/common';
+import { NgxStoriesService } from './ngx-stories.service';
 
 @Component({
   selector: 'ngx-stories',
@@ -14,7 +15,11 @@ import { CommonModule } from '@angular/common';
 })
 export class NgxStoriesComponent implements AfterViewInit {
   title = 'ngx-stories';
+  
+  // Input property to accept the list of persons and their stories
   @Input({ required: true }) persons: Person[] = [];
+  
+  // Output events to handle end of stories, exit, and swipe-up gesture
   @Output() triggerOnEnd = new EventEmitter<void>();
   @Output() triggerOnExit = new EventEmitter<void>();
   @Output() triggerOnSwipeUp = new EventEmitter<void>();
@@ -22,16 +27,19 @@ export class NgxStoriesComponent implements AfterViewInit {
   currentStoryIndex: number = 0;
   currentPersonIndex: number = 0;
   progressWidth: number = 0;
-  intervalId: any;
-  isTransitioning = false;
+  intervalId: any; // Interval for story progress
+  isTransitioning = false; // Prevents multiple transitions at once
   isSwipingLeft = false;
   isSwipingRight = false;
   isHolding = false;
-  holdTimeout: any;
+  holdTimeout: any; // Timeout for holding the story (pause functionality)
   isPaused: boolean = false;
+
+  // Queries the story containers in the view for gesture handling
   @ViewChildren('storyContainer') storyContainers!: QueryList<ElementRef>;
 
   constructor(
+    private storyService: NgxStoriesService
   ) { }
 
   ngOnInit(): void {
@@ -47,13 +55,13 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   startStoryProgress() {
-    this.intervalId && clearInterval(this.intervalId);
-    this.intervalId = setInterval(() => {
+    this.intervalId && this.storyService.clearProgress(this.intervalId);
+    this.intervalId = this.storyService.startProgress(50, () => {
       this.progressWidth += 1;
       if (this.progressWidth >= 100) {
         this.nextStory();
       }
-    }, 50);
+    });
   }
 
   initHammer() {
@@ -106,15 +114,12 @@ export class NgxStoriesComponent implements AfterViewInit {
       this.isTransitioning = false; 
       return;
     }
-    let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
 
-    if (Number(stories?.length) - 1 === this.currentStoryIndex) {
-      this.currentPersonIndex = (this.currentPersonIndex + 1) % this.persons.length;
-      stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
-      this.currentStoryIndex = 0;
-    } else {
-      this.currentStoryIndex = (this.currentStoryIndex + 1) % stories!.length;
-    }
+    // Using the service to determine the next story
+    const { personIndex, storyIndex } = this.storyService.nextStory(this.persons, this.currentPersonIndex, this.currentStoryIndex);
+    this.currentPersonIndex = personIndex;
+    this.currentStoryIndex = storyIndex;
+
     this.progressWidth = 0;
     setTimeout(() => {
       this.startStoryProgress();
@@ -127,19 +132,10 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.isTransitioning = true;
     clearInterval(this.intervalId);
 
-    let stories = this.persons[this.currentPersonIndex]?.stories;
-
-    if (this.currentStoryIndex === 0) {
-      // Move to the previous person if the current story index is 0
-      if (this.currentPersonIndex > 0) {
-        this.currentPersonIndex--;
-        stories = this.persons[this.currentPersonIndex]?.stories;
-        this.currentStoryIndex = stories?.length ? stories.length - 1 : 0;
-      }
-    } else {
-      // Otherwise, just move to the previous story within the same person
-      this.currentStoryIndex--;
-    }
+    // Using the service to determine the previous story
+    const { personIndex, storyIndex } = this.storyService.prevStory(this.persons, this.currentPersonIndex, this.currentStoryIndex);
+    this.currentPersonIndex = personIndex;
+    this.currentStoryIndex = storyIndex;
 
     this.progressWidth = 0;
     setTimeout(() => {
