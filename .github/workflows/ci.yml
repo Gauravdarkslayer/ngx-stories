@@ -20,5 +20,5 @@ jobs:
         run: npm run lint
       - run: npm run build-library
       - name: test
-        run: npm run test
+        run: npm run test:ci
      
