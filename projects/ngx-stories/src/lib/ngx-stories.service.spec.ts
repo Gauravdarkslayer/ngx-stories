@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { NgxStoriesService } from './ngx-stories.service';
+import { Person } from './interfaces/interfaces';
 
 describe('NgxStoriesService', () => {
   let service: NgxStoriesService;
@@ -13,4 +14,111 @@ describe('NgxStoriesService', () => {
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
+
+  describe('startProgress', () => {
+    it('should call callback at the given interval', (done) => {
+      const callback = jasmine.createSpy('callback');
+      const interval = 100;
+
+      const intervalId = service.startProgress(interval, callback);
+
+      setTimeout(() => {
+        expect(callback).toHaveBeenCalledTimes(1);
+        service.clearProgress(intervalId); // Clean up
+        done();
+      }, interval + 50);
+    });
+  });
+
+  describe('clearProgress', () => {
+    it('should clear the interval', (done) => {
+      const callback = jasmine.createSpy('callback');
+      const interval = 100;
+
+      const intervalId = service.startProgress(interval, callback);
+      service.clearProgress(intervalId);
+
+      setTimeout(() => {
+        expect(callback).not.toHaveBeenCalled();
+        done();
+      }, interval + 50);
+    });
+  });
+
+  describe('nextStory', () => {
+    const persons: Person[] = [
+      {
+        id: 1,
+        name: 'John Doe',
+        stories: [
+          { id: 1, type: 'image', content: 'assets/story1.jpg' },
+          { id: 2, type: 'video', content: 'assets/story2.mp4' },
+          { id: 3, type: 'image', content: 'assets/story3.jpg' }
+        ]
+      },
+      {
+        id: 2,
+        name: 'Jane Smith',
+        stories: [
+          { id: 1, type: 'image', content: 'assets/story4.jpg' },
+          { id: 2, type: 'video', content: 'assets/story5.mp4' }
+        ]
+      }
+    ];
+
+    it('should move to the next story within the same person', () => {
+      const result = service.nextStory(persons, 0, 0); // Start at person 0, story 0
+      expect(result.personIndex).toBe(0);
+      expect(result.storyIndex).toBe(1);
+    });
+
+    it('should move to the next person if current story is the last one', () => {
+      const result = service.nextStory(persons, 0, 2); // Start at person 0, story 2 (last story)
+      expect(result.personIndex).toBe(1); // Moved to next person
+      expect(result.storyIndex).toBe(0); // First story of the next person
+    });
+
+  });
+
+
+  describe('prevStory', () => {
+    const persons: Person[] = [
+      {
+        id: 1,
+        name: 'John Doe',
+        stories: [
+          { id: 1, type: 'image', content: 'assets/story1.jpg' },
+          { id: 2, type: 'video', content: 'assets/story2.mp4' },
+          { id: 3, type: 'image', content: 'assets/story3.jpg' }
+        ]
+      },
+      {
+        id: 2,
+        name: 'Jane Smith',
+        stories: [
+          { id: 1, type: 'image', content: 'assets/story4.jpg' },
+          { id: 2, type: 'video', content: 'assets/story5.mp4' }
+        ]
+      }
+    ];
+
+    it('should move to the previous story within the same person', () => {
+      const result = service.prevStory(persons, 0, 2); // Start at person 0, story 2
+      expect(result.personIndex).toBe(0);
+      expect(result.storyIndex).toBe(1);
+    });
+
+    it('should move to the previous person if current story is the first one', () => {
+      const result = service.prevStory(persons, 1, 0); // Start at person 1, story 0
+      expect(result.personIndex).toBe(0); // Moved to previous person
+      expect(result.storyIndex).toBe(2); // Last story of the previous person
+    });
+
+    it('should do nothing if on the first story of the first person', () => {
+      const result = service.prevStory(persons, 0, 0); // First story of the first person
+      expect(result.personIndex).toBe(0);
+      expect(result.storyIndex).toBe(0); // Remains at the first story
+    });
+  });
+  
 });

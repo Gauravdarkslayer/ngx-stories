@@ -12,7 +12,7 @@ export class AppComponent {
   readonly persons: Person[] = [
     {
       id: 1,
-      name: 'Gaurav',
+      name: 'Steve Smith',
       stories: [
         { id: 1, type: 'image', content: 'https://i.ibb.co/ZMVy3KN/pexels-rpnickson-2486168.jpg' },
         { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg' },
@@ -21,7 +21,7 @@ export class AppComponent {
     },
     {
       id: 2,
-      name: 'Rajesh',
+      name: 'John Doe',
       stories: [
         { id: 1, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/4.jpg' },
         { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/5.jpg' },

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-
+import { Person } from "./interfaces/interfaces";
 @Injectable({
   providedIn: 'root',
 })
@@ -17,7 +17,7 @@ export class NgxStoriesService {
     clearInterval(intervalId);
   }
 
-  nextStory(persons: any[], currentPersonIndex: number, currentStoryIndex: number): { personIndex: number, storyIndex: number } {
+  nextStory(persons: Person[], currentPersonIndex: number, currentStoryIndex: number): { personIndex: number, storyIndex: number } {
     let stories = persons[currentPersonIndex]?.stories;
     if (currentStoryIndex === stories.length - 1) {
       // Move to the next person if the current story index is the last
