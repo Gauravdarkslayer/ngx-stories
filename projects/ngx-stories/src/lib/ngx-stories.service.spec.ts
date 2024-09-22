@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { NgxStoriesService } from './ngx-stories.service';
-import { Person } from './interfaces/interfaces';
+import { StoryGroup } from './interfaces/interfaces';
 
 describe('NgxStoriesService', () => {
   let service: NgxStoriesService;
@@ -46,7 +46,7 @@ describe('NgxStoriesService', () => {
   });
 
   describe('nextStory', () => {
-    const persons: Person[] = [
+    const storyGroups: StoryGroup[] = [
       {
         id: 1,
         name: 'John Doe',
@@ -66,23 +66,23 @@ describe('NgxStoriesService', () => {
       }
     ];
 
-    it('should move to the next story within the same person', () => {
-      const result = service.nextStory(persons, 0, 0); // Start at person 0, story 0
-      expect(result.personIndex).toBe(0);
+    it('should move to the next story within the same storyGroup', () => {
+      const result = service.nextStory(storyGroups, 0, 0); // Start at storyGroup 0, story 0
+      expect(result.storyGroupIndex).toBe(0);
       expect(result.storyIndex).toBe(1);
     });
 
-    it('should move to the next person if current story is the last one', () => {
-      const result = service.nextStory(persons, 0, 2); // Start at person 0, story 2 (last story)
-      expect(result.personIndex).toBe(1); // Moved to next person
-      expect(result.storyIndex).toBe(0); // First story of the next person
+    it('should move to the next storyGroup if current story is the last one', () => {
+      const result = service.nextStory(storyGroups, 0, 2); // Start at storyGroup 0, story 2 (last story)
+      expect(result.storyGroupIndex).toBe(1); // Moved to next storyGroup
+      expect(result.storyIndex).toBe(0); // First story of the next storyGroup
     });
 
   });
 
 
   describe('prevStory', () => {
-    const persons: Person[] = [
+    const storyGroups: StoryGroup[] = [
       {
         id: 1,
         name: 'John Doe',
@@ -102,21 +102,21 @@ describe('NgxStoriesService', () => {
       }
     ];
 
-    it('should move to the previous story within the same person', () => {
-      const result = service.prevStory(persons, 0, 2); // Start at person 0, story 2
-      expect(result.personIndex).toBe(0);
+    it('should move to the previous story within the same storyGroup', () => {
+      const result = service.prevStory(storyGroups, 0, 2); // Start at storyGroup 0, story 2
+      expect(result.storyGroupIndex).toBe(0);
       expect(result.storyIndex).toBe(1);
     });
 
-    it('should move to the previous person if current story is the first one', () => {
-      const result = service.prevStory(persons, 1, 0); // Start at person 1, story 0
-      expect(result.personIndex).toBe(0); // Moved to previous person
-      expect(result.storyIndex).toBe(2); // Last story of the previous person
+    it('should move to the previous storyGroup if current story is the first one', () => {
+      const result = service.prevStory(storyGroups, 1, 0); // Start at storyGroup 1, story 0
+      expect(result.storyGroupIndex).toBe(0); // Moved to previous storyGroup
+      expect(result.storyIndex).toBe(2); // Last story of the previous storyGroup
     });
 
-    it('should do nothing if on the first story of the first person', () => {
-      const result = service.prevStory(persons, 0, 0); // First story of the first person
-      expect(result.personIndex).toBe(0);
+    it('should do nothing if on the first story of the first storyGroup', () => {
+      const result = service.prevStory(storyGroups, 0, 0); // First story of the first storyGroup
+      expect(result.storyGroupIndex).toBe(0);
       expect(result.storyIndex).toBe(0); // Remains at the first story
     });
   });

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NgxStoriesComponent, Person } from '../../projects/ngx-stories/src/public-api';
+import { NgxStoriesComponent, StoryGroup } from '../../projects/ngx-stories/src/public-api';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +9,7 @@ import { NgxStoriesComponent, Person } from '../../projects/ngx-stories/src/publ
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  readonly persons: Person[] = [
+  readonly storyGroups: StoryGroup[] = [
     {
       id: 1,
       name: 'Steve Smith',

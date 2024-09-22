@@ -24,7 +24,7 @@ import { NgxStoriesComponent } from 'ngx-stories';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  persons = [
+  storyGroups = [
       {
         id: 1,
         name: 'John Doe',
@@ -44,11 +44,11 @@ export class AppComponent {
 ```
 
 ```html
-<ngx-stories [persons]="persons"></ngx-stories>
+<ngx-stories [storyGroups]="storyGroups"></ngx-stories>
 ```
 
 ## Features
-* Dynamic Story Carousel: Display a collection of stories for each person.
+* Dynamic Story Carousel: Display a collection of stories for each storyGroup.
 * Easy Integration: Simple and straightforward to integrate into your Angular project.
 * Story Progress Tracker: Track the progress of each story as the user navigates through the stories.
 * Swipe Gestures (Mobile Friendly): Allow users to swipe left or right to navigate through the stories.

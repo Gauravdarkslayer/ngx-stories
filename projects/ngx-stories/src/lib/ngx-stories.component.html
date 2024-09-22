@@ -1,13 +1,13 @@
-@for(person of persons; track person.id; let i=$index) {
-<div class="story-container" #storyContainer [class.active]="i === currentPersonIndex"
+@for(storyGroup of storyGroups; track storyGroup.id; let i=$index) {
+<div class="story-container" #storyContainer [class.active]="i === currentStoryGroupIndex"
   [class.swipe-left]="isSwipingLeft" [class.swipe-right]="isSwipingRight" (mousedown)="onTouchStart()"
   (mouseup)="onRelease()" (touchstart)="onTouchStart()" (touchend)="onRelease()"
   (contextmenu)="disableContextMenu($event)">
-  @for(story of person.stories; track story.id; let z = $index ) {
+  @for(story of storyGroup.stories; track story.id; let z = $index ) {
   <div [class.active]="z === currentStoryIndex" class="story-content">
     <div class="story-content-container">
       <h5 [style.visibility]="isHolding ? 'hidden' : 'visible'">
-        {{person.name}}
+        {{storyGroup.name}}
       </h5>
       <button (click)="togglePause()">
         <img [ngClass]="{ 'pause-icon': isPaused, 'play-icon': !isPaused }" [alt]="isPaused ? 'play-icon' : 'pause-icon'" width="20" height="20">
@@ -20,13 +20,13 @@
   }
 
   <div class="progress-bar-container" [style.visibility]="isHolding ? 'hidden' : 'visible'">
-    @for(story of person.stories; track story.id; let x = $index ) {
+    @for(story of storyGroup.stories; track story.id; let x = $index ) {
     <progress class="progress-bar" [value]="getProgressValue(x)" max="100" [class.active]="x===currentStoryIndex">
     </progress>
     <div style="width: 2vw;"></div>
     }
   </div>
-  @if(!(currentPersonIndex === 0 && currentStoryIndex === 0) ) {
+  @if(!(currentStoryGroupIndex === 0 && currentStoryIndex === 0) ) {
   <button class="prev" (click)="prevStory()">Previous</button>
   }
   <button class="next" style="right: 1%;" (click)="nextStory()">Next</button>

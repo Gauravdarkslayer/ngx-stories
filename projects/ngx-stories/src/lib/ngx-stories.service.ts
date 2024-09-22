@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Person } from "./interfaces/interfaces";
+import { StoryGroup } from "./interfaces/interfaces";
 @Injectable({
   providedIn: 'root',
 })
@@ -17,32 +17,32 @@ export class NgxStoriesService {
     clearInterval(intervalId);
   }
 
-  nextStory(persons: Person[], currentPersonIndex: number, currentStoryIndex: number): { personIndex: number, storyIndex: number } {
-    let stories = persons[currentPersonIndex]?.stories;
+  nextStory(storyGroups: StoryGroup[], currentStoryGroupIndex: number, currentStoryIndex: number): { storyGroupIndex: number, storyIndex: number } {
+    let stories = storyGroups[currentStoryGroupIndex]?.stories;
     if (currentStoryIndex === stories.length - 1) {
-      // Move to the next person if the current story index is the last
-      currentPersonIndex = (currentPersonIndex + 1) % persons.length;
+      // Move to the next storyGroup if the current story index is the last
+      currentStoryGroupIndex = (currentStoryGroupIndex + 1) % storyGroups.length;
       currentStoryIndex = 0;
     } else {
-      // Otherwise, just move to the next story within the same person
+      // Otherwise, just move to the next story within the same storyGroup
       currentStoryIndex++;
     }
-    return { personIndex: currentPersonIndex, storyIndex: currentStoryIndex };
+    return { storyGroupIndex: currentStoryGroupIndex, storyIndex: currentStoryIndex };
   }
 
-  prevStory(persons: any[], currentPersonIndex: number, currentStoryIndex: number): { personIndex: number, storyIndex: number } {
-    let stories = persons[currentPersonIndex]?.stories;
+  prevStory(storyGroups: StoryGroup[], currentStoryGroupIndex: number, currentStoryIndex: number): { storyGroupIndex: number, storyIndex: number } {
+    let stories = storyGroups[currentStoryGroupIndex]?.stories;
     if (currentStoryIndex === 0) {
-      // Move to the previous person if the current story index is 0
-      if (currentPersonIndex > 0) {
-        currentPersonIndex--;
-        stories = persons[currentPersonIndex]?.stories;
+      // Move to the previous storyGroup if the current story index is 0
+      if (currentStoryGroupIndex > 0) {
+        currentStoryGroupIndex--;
+        stories = storyGroups[currentStoryGroupIndex]?.stories;
         currentStoryIndex = stories.length - 1;
       }
     } else {
-      // Otherwise, just move to the previous story within the same person
+      // Otherwise, just move to the previous story within the same storyGroup
       currentStoryIndex--;
     }
-    return { personIndex: currentPersonIndex, storyIndex: currentStoryIndex };
+    return { storyGroupIndex: currentStoryGroupIndex, storyIndex: currentStoryIndex };
   }
 }
