@@ -5,6 +5,7 @@ import { StoryGroup } from '../lib/interfaces/interfaces';
 import "hammerjs";
 import { CommonModule } from '@angular/common';
 import { NgxStoriesService } from './ngx-stories.service';
+import { NgxStoriesOptions } from '../lib/interfaces/interfaces';
 
 @Component({
   selector: 'ngx-stories',
@@ -19,6 +20,11 @@ export class NgxStoriesComponent implements AfterViewInit {
   // Input property to accept the list of storyGroup and their stories
   @Input({ required: true }) storyGroups: StoryGroup[] = [];
   
+  // options
+  @Input() options: NgxStoriesOptions = {
+    width: 360,
+    height: 768,
+  };
   // Output events to handle end of stories, exit, and swipe-up gesture
   @Output() triggerOnEnd = new EventEmitter<void>();
   @Output() triggerOnExit = new EventEmitter<void>();
@@ -73,6 +79,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       hammer.on('swipedown', () => this.handleSwipe('down'));
       hammer.on('swipeup', () => this.handleSwipe('up'));
     });
+    this.storyService.setOptions(this.options, this.storyContainers);
   }
 
   handleSwipe(direction: string) {

@@ -10,3 +10,8 @@ export interface StoryGroup {
     name: string, // name of the storyGroup which is to be displayed over story
     stories: Story[] // array of stories
 }
+
+export interface NgxStoriesOptions {
+    width: number,
+    height: number,
+}

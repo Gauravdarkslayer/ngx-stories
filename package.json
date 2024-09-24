@@ -10,10 +10,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test ngx-stories",
     "test:ci": "ng test ngx-stories --watch=false --browsers=ChromeHeadless --code-coverage",
-    "publish": "npm run build-library && npm run postbuild-library && npm run pack-lib && cd dist/ngx-stories && npm publish --access public",
+    "publish": "npm run copy:readme && npm run build-library && npm run pack-lib && cd dist/ngx-stories && npm publish --access public",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
-    "postbuild-library": "cpy README.md LICENSE projects/ngx-stories"
+    "copy:readme": "cpy README.md LICENSE projects/ngx-stories"
   },
   "private": true,
   "dependencies": {

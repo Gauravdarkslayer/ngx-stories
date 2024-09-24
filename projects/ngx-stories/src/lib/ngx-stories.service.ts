@@ -1,5 +1,5 @@
-import { Injectable } from "@angular/core";
-import { StoryGroup } from "./interfaces/interfaces";
+import { ElementRef, Injectable, QueryList } from "@angular/core";
+import { NgxStoriesOptions, StoryGroup } from "./interfaces/interfaces";
 @Injectable({
   providedIn: 'root',
 })
@@ -44,5 +44,15 @@ export class NgxStoriesService {
       currentStoryIndex--;
     }
     return { storyGroupIndex: currentStoryGroupIndex, storyIndex: currentStoryIndex };
+  }
+
+  setOptions(options: NgxStoriesOptions, storyContainers: QueryList<ElementRef>): void {
+    // Set the options for the service
+    // Set the width and height of the story container
+    storyContainers?.forEach(storyContainer => {
+      storyContainer.nativeElement.style.width = options.width + 'px';
+      storyContainer.nativeElement.style.height = options.height + 'px';
+    });
+
   }
 }
