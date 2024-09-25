@@ -14,7 +14,7 @@ npm install ngx-stories
 ```
 
 ```ts
-import { NgxStoriesComponent } from 'ngx-stories';
+import { NgxStoriesComponent, StoryGroup } from 'ngx-stories';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +24,7 @@ import { NgxStoriesComponent } from 'ngx-stories';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  storyGroups = [
+  storyGroups: StoryGroup[] = [
       {
         id: 1,
         name: 'John Doe',
