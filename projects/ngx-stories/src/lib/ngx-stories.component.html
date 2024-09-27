@@ -10,7 +10,8 @@
         {{storyGroup.name}}
       </h5>
       <button (click)="togglePause()">
-        <img [ngClass]="{ 'pause-icon': isPaused, 'play-icon': !isPaused }" [alt]="isPaused ? 'play-icon' : 'pause-icon'" width="20" height="20">
+        <img [ngClass]="{ 'pause-icon': storyState==='paused', 'play-icon': storyState==='playing' }"
+          [alt]="storyState==='paused' ? 'play-icon' : 'pause-icon'" width="20" height="20">
       </button>
     </div>
     <div class="story-image-container">
@@ -27,8 +28,8 @@
     }
   </div>
   @if(!(currentStoryGroupIndex === 0 && currentStoryIndex === 0) ) {
-  <button class="prev" (click)="prevStory()">Previous</button>
+  <button class="prev" (click)="navigateStory('previous')">Previous</button>
   }
-  <button class="next" style="right: 1%;" (click)="nextStory()">Next</button>
+  <button class="next" (click)="navigateStory('next')">Next</button>
 </div>
 }

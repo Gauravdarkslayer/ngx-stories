@@ -16,10 +16,10 @@ import { NgxStoriesOptions } from '../lib/interfaces/interfaces';
 })
 export class NgxStoriesComponent implements AfterViewInit {
   title = 'ngx-stories';
-  
+
   // Input property to accept the list of storyGroup and their stories
   @Input({ required: true }) storyGroups: StoryGroup[] = [];
-  
+
   // options
   @Input() options: NgxStoriesOptions = {
     width: 360,
@@ -39,7 +39,12 @@ export class NgxStoriesComponent implements AfterViewInit {
   isSwipingRight = false;
   isHolding = false;
   holdTimeout: any; // Timeout for holding the story (pause functionality)
-  isPaused: boolean = false;
+  storyState: 'playing' | 'paused' | 'holding' = 'playing';
+
+  // constants
+  readonly HOLD_DELAY_MS = 500;
+  readonly PROGRESS_INTERVAL_MS = 50;
+  readonly FULL_PROGRESS_WIDTH = 100;
 
   // Queries the story containers in the view for gesture handling
   @ViewChildren('storyContainer') storyContainers!: QueryList<ElementRef>;
@@ -60,17 +65,17 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.initHammer();
   }
 
-  startStoryProgress() {
+  private startStoryProgress() {
     this.intervalId && this.storyService.clearProgress(this.intervalId);
-    this.intervalId = this.storyService.startProgress(50, () => {
+    this.intervalId = this.storyService.startProgress(this.PROGRESS_INTERVAL_MS, () => {
       this.progressWidth += 1;
-      if (this.progressWidth >= 100) {
-        this.nextStory();
+      if (this.progressWidth >= this.FULL_PROGRESS_WIDTH) {
+        this.navigateStory('next');
       }
     });
   }
 
-  initHammer() {
+  private initHammer() {
     this.storyContainers?.forEach(storyContainer => {
       const hammer = new Hammer(storyContainer.nativeElement);
       hammer.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
@@ -82,22 +87,22 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.storyService.setOptions(this.options, this.storyContainers);
   }
 
-  handleSwipe(direction: string) {
+  private handleSwipe(direction: string) {
     if (direction === 'left') {
       this.isSwipingLeft = true;
       setTimeout(() => {
         if (this.currentStoryGroupIndex === this.storyGroups.length - 1) {
           let stories = this.storyGroups.find((storyGroup, index) => index === this.currentStoryGroupIndex)?.stories;
           this.currentStoryIndex = Number(stories?.length) - 1;
-          if (this.checkEnd()) return;
+          if (this.hasReachedEndOfStories()) return;
         }
-        this.nextStoryGroup();
+        this.goToNextStoryGroup();
         this.resetSwipe();
       }, 600); // Match the animation duration
     } else if (direction === 'right') {
       this.isSwipingRight = true;
       setTimeout(() => {
-        this.prevStoryGroup();
+        this.goToPreviousStoryGroup();
         this.resetSwipe();
       }, 600); // Match the animation duration
     } else if (direction === 'down') {
@@ -108,65 +113,44 @@ export class NgxStoriesComponent implements AfterViewInit {
     }
   }
 
-  resetSwipe() {
+  private resetSwipe() {
     this.isSwipingLeft = false;
     this.isSwipingRight = false;
   }
 
-  nextStory() {
+  navigateStory(direction: 'next' | 'previous') {
     if (this.isTransitioning) return;
-    this.isTransitioning = true;
+    this.setTransitionState(true);
     clearInterval(this.intervalId);
-    if (this.checkEnd()) { 
-      this.isTransitioning = false; 
-      return;
-    }
 
-    // Using the service to determine the next story
-    const { storyGroupIndex, storyIndex } = this.storyService.nextStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex);
+    const { storyGroupIndex, storyIndex } =
+      direction === 'next'
+        ? this.storyService.nextStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex)
+        : this.storyService.prevStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex);
+
     this.currentStoryGroupIndex = storyGroupIndex;
     this.currentStoryIndex = storyIndex;
 
     this.progressWidth = 0;
-    setTimeout(() => {
-      this.startStoryProgress();
-      this.isTransitioning = false;
-    }, 500); // Match this timeout with the CSS transition duration
+    this.setTransitionState(false, this.HOLD_DELAY_MS);
+    this.startStoryProgress();
   }
 
-  prevStory() {
-    if (this.isTransitioning) return;
-    this.isTransitioning = true;
-    clearInterval(this.intervalId);
-
-    // Using the service to determine the previous story
-    const { storyGroupIndex, storyIndex } = this.storyService.prevStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex);
-    this.currentStoryGroupIndex = storyGroupIndex;
-    this.currentStoryIndex = storyIndex;
-
-    this.progressWidth = 0;
-    setTimeout(() => {
-      this.startStoryProgress();
-      this.isTransitioning = false;
-    }, 500); // Match this timeout with the CSS transition duration
-  }
-
-
-  nextStoryGroup() {
+  private goToNextStoryGroup() {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     this.currentStoryGroupIndex = (this.currentStoryGroupIndex + 1) % this.storyGroups.length;
-    if (this.checkEnd()) return;
+    if (this.hasReachedEndOfStories()) return;
     this.currentStoryIndex = 0;
     clearInterval(this.intervalId);
     this.progressWidth = 0;
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
-    }, 500); // Match this timeout with the CSS transition duration
+    }, this.HOLD_DELAY_MS); // Match this timeout with the CSS transition duration
   }
 
-  prevStoryGroup() {
+  private goToPreviousStoryGroup() {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     this.currentStoryIndex = 0;
@@ -178,10 +162,17 @@ export class NgxStoriesComponent implements AfterViewInit {
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
-    }, 500); // Match this timeout with the CSS transition duration
+    }, this.HOLD_DELAY_MS); // Match this timeout with the CSS transition duration
   }
 
-  checkEnd(): boolean {
+  private setTransitionState(isTransitioning: boolean, duration = this.HOLD_DELAY_MS): void {
+    this.isTransitioning = isTransitioning;
+    setTimeout(() => {
+      this.isTransitioning = false;
+    }, duration); // Ensure consistent transition timing
+  }
+
+  private hasReachedEndOfStories(): boolean {
     let stories = this.storyGroups.find((storyGroup, index) => index === this.currentStoryGroupIndex)?.stories;
     if (this.currentStoryIndex === Number(stories?.length) - 1 && this.currentStoryGroupIndex === this.storyGroups.length - 1) {
       this.onEnd();
@@ -193,7 +184,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   getProgressValue(storyIndex: number): number {
     if (this.isHolding) return this.progressWidth;
     if (storyIndex < this.currentStoryIndex) {
-      return 100;
+      return this.FULL_PROGRESS_WIDTH;
     } else if (storyIndex === this.currentStoryIndex) {
       return this.progressWidth;
     } else {
@@ -204,7 +195,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   onTouchStart() {
     this.holdTimeout = setTimeout(() => {
       this.onHold();
-    }, 500);  // 500ms delay
+    }, this.HOLD_DELAY_MS);
   }
 
   onHold() {
@@ -223,25 +214,24 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   togglePause() {
-    if (this.isPaused) {
-      this.isPaused = false;
-      this.startStoryProgress();
-    } else {
-      this.isPaused = true;
+    this.storyState = this.storyState === 'paused' ? 'playing' : 'paused';
+    if (this.storyState === 'paused') {
       clearInterval(this.intervalId);
+    } else {
+      this.startStoryProgress();
     }
   }
 
-  onEnd() {
+  private onEnd() {
     this.triggerOnEnd.emit();
   }
 
-  onExit() {
-    // Swipe down event
+  private onExit() {
+    // Swipe down event or cross button implementation in future
     this.triggerOnExit.emit();
   }
 
-  onSwipeUpTriggered() {
+  private onSwipeUpTriggered() {
     this.triggerOnSwipeUp.emit();
   }
 }
