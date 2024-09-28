@@ -25,18 +25,18 @@ jobs:
   success_status:
     needs: build
     runs-on: ubuntu-latest
-    if: success() # Runs only if the previous jobs are successful
+    if: success()
     steps:
       - name: Set GitHub commit status to success
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.repos.createCommitStatus({
+            await github.repos.createStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: context.sha,
               state: 'success',
-              description: 'CI passed',
-              context: 'CI build status'
+              description: 'CI passed successfully',
+              context: 'CI build'
             })
