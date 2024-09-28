@@ -17,12 +17,15 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: lint
-
+        run: npm run lint
+      - run: npm run build-library
+      - name: test
+        run: npm run test:ci
 
   success_status:
     needs: build
     runs-on: ubuntu-latest
-    if: success()
+    if: success() # this makes sure it only runs if the build succeeded
     steps:
       - name: Set GitHub commit status to success
         uses: actions/github-script@v6
@@ -31,6 +34,8 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const sha = context.sha;
+
+            console.log("Setting commit status to success for SHA: ", sha);
 
             await github.repos.createCommitStatus({
               owner,
