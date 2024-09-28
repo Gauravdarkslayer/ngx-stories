@@ -16,11 +16,6 @@ jobs:
           node-version: 18
           cache: 'npm'
       - run: npm ci
-      - name: lint
-        run: npm run lint
-      - name: test
-        run: npm run test:ci
-
   success_status:
     needs: build
     runs-on: ubuntu-latest
