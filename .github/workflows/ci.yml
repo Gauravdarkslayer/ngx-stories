@@ -37,7 +37,7 @@ jobs:
 
             console.log("Setting commit status to success for SHA: ", sha);
 
-            await github.repos.createCommitStatus({
+            await github.rest.repos.createStatus({
               owner,
               repo,
               sha,
