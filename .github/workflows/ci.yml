@@ -42,5 +42,5 @@ jobs:
               sha,
               state: 'success',
               description: 'CI passed successfully',
-              context: 'CI build',
+              context: 'CI Should pass',
             });
