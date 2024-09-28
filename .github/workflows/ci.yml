@@ -24,7 +24,7 @@ jobs:
   success_status:
     needs: build
     runs-on: ubuntu-latest
-    if: success() # this makes sure it only runs if the build succeeded
+    if: success()
     steps:
       - name: Set GitHub commit status to success
         uses: actions/github-script@v6
