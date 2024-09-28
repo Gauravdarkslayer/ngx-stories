@@ -120,5 +120,5 @@ describe('NgxStoriesService', () => {
       expect(result.storyIndex).toBe(0); // Remains at the first story
     });
   });
-
+  
 });
