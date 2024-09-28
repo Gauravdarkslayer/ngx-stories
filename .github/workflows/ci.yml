@@ -31,11 +31,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.actions.createStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+            const { repo, owner } = context.repo;
+            await github.rest.repos.createStatus({
+              owner,
+              repo,
               sha: context.sha,
               state: 'success',
               description: 'CI passed successfully',
               context: 'CI build'
-            })
+            });
