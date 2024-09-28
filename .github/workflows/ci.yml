@@ -20,25 +20,3 @@ jobs:
         run: npm run lint
       - name: test
         run: npm run test:ci
-  success_status:
-    needs: build
-    runs-on: ubuntu-latest
-    if: success()
-    steps:
-      - name: Set GitHub commit status to success
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { owner, repo } = context.repo;
-            const sha = context.sha;
-            await github.rest.repos.createCommitStatus({
-              owner,
-              repo,
-              sha,
-              state: 'success',
-              description: 'CI passed successfully',
-              context: 'CI',
-            });
-
-
