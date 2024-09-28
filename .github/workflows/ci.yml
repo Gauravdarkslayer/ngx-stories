@@ -21,4 +21,22 @@ jobs:
       - run: npm run build-library
       - name: test
         run: npm run test:ci
-     
+
+  success_status:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success() # Runs only if the previous jobs are successful
+    steps:
+      - name: Set GitHub commit status to success
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'success',
+              description: 'CI passed',
+              context: 'CI build status'
+            })
