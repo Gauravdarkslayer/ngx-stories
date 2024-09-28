@@ -32,7 +32,7 @@ export class AppComponent {
   ];
 
   triggerOnEnd() {
-    alert('Stories End');
+    alert('Stories Ended !');
   }
 
   triggerOnExit() {
