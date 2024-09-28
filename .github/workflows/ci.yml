@@ -33,14 +33,11 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const sha = context.sha;
-
-            console.log("Setting commit status to success for SHA: ", sha);
-
             await github.rest.repos.createCommitStatus({
               owner,
               repo,
               sha,
               state: 'success',
               description: 'CI passed successfully',
-              context: 'CI Should pass',
+              context: 'CI',
             });
