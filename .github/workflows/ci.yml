@@ -18,7 +18,6 @@ jobs:
       - run: npm ci
       - name: lint
         run: npm run lint
-      - run: npm run build-library
       - name: test
         run: npm run test:ci
 
@@ -32,7 +31,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.repos.createStatus({
+            await github.rest.actions.createStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: context.sha,
