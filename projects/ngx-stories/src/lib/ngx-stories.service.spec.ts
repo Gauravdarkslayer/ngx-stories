@@ -67,7 +67,7 @@ describe('NgxStoriesService', () => {
     ];
 
     it('should move to the next story within the same storyGroup', () => {
-      const result = service.nextStory(storyGroups, 1, 0); // Start at storyGroup 0, story 0
+      const result = service.nextStory(storyGroups, 1, 1); // Start at storyGroup 0, story 0
       expect(result.storyGroupIndex).toBe(0);
       expect(result.storyIndex).toBe(1);
     });
