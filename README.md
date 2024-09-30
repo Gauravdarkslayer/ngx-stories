@@ -2,7 +2,8 @@
 
 An Angular library for displaying user stories in a carousel format.
 
-![npm](https://img.shields.io/npm/v/ngx-stories)
+[![npm downloads](https://img.shields.io/npm/dt/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
+[![npm version](https://img.shields.io/npm/v/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
 
 
 ## For Version 17+
