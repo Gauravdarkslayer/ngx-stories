@@ -17,12 +17,16 @@ export class NgxStoriesService {
     clearInterval(intervalId);
   }
 
-  nextStory(storyGroups: StoryGroup[], currentStoryGroupIndex: number, currentStoryIndex: number): { storyGroupIndex: number, storyIndex: number } {
+  nextStory(storyGroups: StoryGroup[],
+    currentStoryGroupIndex: number,
+    currentStoryIndex: number,
+    onStoryGroupChange: (storyGroupIndex: number) => void): { storyGroupIndex: number, storyIndex: number } {
     let stories = storyGroups[currentStoryGroupIndex]?.stories;
     if (currentStoryIndex === stories.length - 1) {
       // Move to the next storyGroup if the current story index is the last
       currentStoryGroupIndex = (currentStoryGroupIndex + 1) % storyGroups.length;
       currentStoryIndex = 0;
+      onStoryGroupChange(currentStoryGroupIndex);
     } else {
       // Otherwise, just move to the next story within the same storyGroup
       currentStoryIndex++;
@@ -30,7 +34,10 @@ export class NgxStoriesService {
     return { storyGroupIndex: currentStoryGroupIndex, storyIndex: currentStoryIndex };
   }
 
-  prevStory(storyGroups: StoryGroup[], currentStoryGroupIndex: number, currentStoryIndex: number): { storyGroupIndex: number, storyIndex: number } {
+  prevStory(storyGroups: StoryGroup[],
+    currentStoryGroupIndex: number,
+    currentStoryIndex: number,
+    onStoryGroupChange: (storyGroupIndex: number) => void): { storyGroupIndex: number, storyIndex: number } {
     let stories = storyGroups[currentStoryGroupIndex]?.stories;
     if (currentStoryIndex === 0) {
       // Move to the previous storyGroup if the current story index is 0
@@ -38,6 +45,7 @@ export class NgxStoriesService {
         currentStoryGroupIndex--;
         stories = storyGroups[currentStoryGroupIndex]?.stories;
         currentStoryIndex = stories.length - 1;
+        onStoryGroupChange(currentStoryGroupIndex);
       }
     } else {
       // Otherwise, just move to the previous story within the same storyGroup
