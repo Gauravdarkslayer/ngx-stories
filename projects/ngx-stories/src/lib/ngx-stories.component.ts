@@ -1,11 +1,12 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
 import { StoryGroup } from '../lib/interfaces/interfaces';
-import "hammerjs";
 import { CommonModule } from '@angular/common';
 import { NgxStoriesService } from './ngx-stories.service';
 import { NgxStoriesOptions } from '../lib/interfaces/interfaces';
+import { onStoryGroupChange, triggerOnEnd, triggerOnExit, triggerOnSwipeUp } from './utils/story-event-emitters';
+import "hammerjs";
 
 @Component({
   selector: 'ngx-stories',
@@ -26,9 +27,10 @@ export class NgxStoriesComponent implements AfterViewInit {
     height: 768,
   };
   // Output events to handle end of stories, exit, and swipe-up gesture
-  @Output() triggerOnEnd = new EventEmitter<void>();
-  @Output() triggerOnExit = new EventEmitter<void>();
-  @Output() triggerOnSwipeUp = new EventEmitter<void>();
+  @Output() triggerOnEnd = triggerOnEnd;
+  @Output() triggerOnExit = triggerOnExit;
+  @Output() triggerOnSwipeUp = triggerOnSwipeUp;
+  @Output() onStoryGroupChange = onStoryGroupChange;
 
   currentStoryIndex: number = 0;
   currentStoryGroupIndex: number = 0;
@@ -125,8 +127,8 @@ export class NgxStoriesComponent implements AfterViewInit {
 
     const { storyGroupIndex, storyIndex } =
       direction === 'next'
-        ? this.storyService.nextStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex)
-        : this.storyService.prevStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex);
+        ? this.storyService.nextStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, this.storyGroupChange.bind(this))
+        : this.storyService.prevStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, this.storyGroupChange.bind(this));
 
     this.currentStoryGroupIndex = storyGroupIndex;
     this.currentStoryIndex = storyIndex;
@@ -144,6 +146,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.currentStoryIndex = 0;
     clearInterval(this.intervalId);
     this.progressWidth = 0;
+    this.storyGroupChange();
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
@@ -159,6 +162,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       this.currentStoryGroupIndex--;
     }
     this.progressWidth = 0;
+    this.storyGroupChange();
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
@@ -233,5 +237,9 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   private onSwipeUpTriggered() {
     this.triggerOnSwipeUp.emit();
+  }
+
+  private storyGroupChange(storyGroupIndex: number = this.currentStoryGroupIndex) {
+    this.onStoryGroupChange.emit(storyGroupIndex);
   }
 }
