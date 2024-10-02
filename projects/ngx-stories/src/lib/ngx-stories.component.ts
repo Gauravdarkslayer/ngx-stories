@@ -133,7 +133,11 @@ export class NgxStoriesComponent implements AfterViewInit {
 
     this.progressWidth = 0;
     this.setTransitionState(false, this.HOLD_DELAY_MS);
-    this.startStoryProgress();
+
+    if (this.storyState !== 'paused') {
+      this.storyState = 'playing';
+      this.startStoryProgress();
+    }
   }
 
   private goToNextStoryGroup() {
@@ -200,6 +204,7 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   onHold() {
     this.isHolding = true;
+    this.storyState = 'paused';
     clearInterval(this.intervalId);
   }
 
