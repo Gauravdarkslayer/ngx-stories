@@ -204,9 +204,12 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   onRelease() {
-    this.isHolding = false;
     clearTimeout(this.holdTimeout);  // Cancel hold if user releases before 1 second
-    this.startStoryProgress();
+    if (this.isHolding) {
+      this.isHolding = false;
+      this.storyState = 'playing';
+      this.startStoryProgress();
+    }
   }
 
   disableContextMenu(event: MouseEvent) {
