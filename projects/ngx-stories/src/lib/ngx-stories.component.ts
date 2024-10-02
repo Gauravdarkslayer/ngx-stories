@@ -135,7 +135,11 @@ export class NgxStoriesComponent implements AfterViewInit {
 
     this.progressWidth = 0;
     this.setTransitionState(false, this.HOLD_DELAY_MS);
-    this.startStoryProgress();
+
+    if (this.storyState !== 'paused') {
+      this.storyState = 'playing';
+      this.startStoryProgress();
+    }
   }
 
   private goToNextStoryGroup() {
@@ -204,13 +208,17 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   onHold() {
     this.isHolding = true;
+    this.storyState = 'paused';
     clearInterval(this.intervalId);
   }
 
   onRelease() {
-    this.isHolding = false;
     clearTimeout(this.holdTimeout);  // Cancel hold if user releases before 1 second
-    this.startStoryProgress();
+    if (this.isHolding) {
+      this.isHolding = false;
+      this.storyState = 'playing';
+      this.startStoryProgress();
+    }
   }
 
   disableContextMenu(event: MouseEvent) {
