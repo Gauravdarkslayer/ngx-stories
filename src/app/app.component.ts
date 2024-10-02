@@ -38,4 +38,8 @@ export class AppComponent {
   triggerOnExit() {
     alert('Exit');
   }
+
+  triggerOnStoryGroupChange(storyGroup: number) {
+    console.log(storyGroup);
+  }
 }
