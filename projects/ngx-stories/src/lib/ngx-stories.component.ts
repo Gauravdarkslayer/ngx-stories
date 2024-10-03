@@ -65,7 +65,20 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.initHammer();
+    document.addEventListener('keydown', (event: KeyboardEvent) => this.handleKeyPress(event));
   }
+
+  handleKeyPress(event: KeyboardEvent): void {
+    if (event.key === 'ArrowRight') {
+      this.navigateStory('next'); // Move to the next story
+    } else if (event.key === 'ArrowLeft') {
+      this.navigateStory('previous'); // Move to the previous story
+    } else if (event.key === ' ') {
+      event.preventDefault();
+      this.togglePause(); // Toggle between pause and play
+    }
+  }
+  
 
   private startStoryProgress() {
     this.intervalId && this.storyService.clearProgress(this.intervalId);
