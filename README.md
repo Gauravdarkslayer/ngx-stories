@@ -1,6 +1,6 @@
 # Ngx Stories
 
-An Angular library for displaying user stories in a carousel format.
+An Angular component to render instagram like stories.
 
 [![npm downloads](https://img.shields.io/npm/dt/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
 [![npm version](https://img.shields.io/npm/v/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
@@ -40,6 +40,7 @@ export class AppComponent {
         name: 'Jane Smith',
         stories: [
           { id: 103, type: 'image', content: 'https://example.com/story3.jpg' },
+          { id: 3, type: 'video', content: 'https://example.com/video-story.mp4' },
         ],
       },
     ];
