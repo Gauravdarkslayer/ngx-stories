@@ -22,8 +22,9 @@ export class AppComponent {
       name: 'Steve Smith',
       stories: [
         { id: 1, type: 'image', content: 'https://i.ibb.co/ZMVy3KN/pexels-rpnickson-2486168.jpg' },
-        { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg' },
-        { id: 3, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
+        { id: 2, type: 'video', content: 'https://videos.pexels.com/video-files/3468587/3468587-uhd_1440_2560_30fps.mp4' },
+        { id: 3, type: 'video', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+        { id: 4, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
       ]
     },
     {
