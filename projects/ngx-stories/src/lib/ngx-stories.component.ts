@@ -1,11 +1,12 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
 import { StoryGroup } from '../lib/interfaces/interfaces';
-import "hammerjs";
 import { CommonModule } from '@angular/common';
 import { NgxStoriesService } from './ngx-stories.service';
 import { NgxStoriesOptions } from '../lib/interfaces/interfaces';
+import { onStoryGroupChange, triggerOnEnd, triggerOnExit, triggerOnSwipeUp } from './utils/story-event-emitters';
+import "hammerjs";
 
 @Component({
   selector: 'ngx-stories',
@@ -26,9 +27,10 @@ export class NgxStoriesComponent implements AfterViewInit {
     height: 768,
   };
   // Output events to handle end of stories, exit, and swipe-up gesture
-  @Output() triggerOnEnd = new EventEmitter<void>();
-  @Output() triggerOnExit = new EventEmitter<void>();
-  @Output() triggerOnSwipeUp = new EventEmitter<void>();
+  @Output() triggerOnEnd = triggerOnEnd;
+  @Output() triggerOnExit = triggerOnExit;
+  @Output() triggerOnSwipeUp = triggerOnSwipeUp;
+  @Output() onStoryGroupChange = onStoryGroupChange;
 
   currentStoryIndex: number = 0;
   currentStoryGroupIndex: number = 0;
@@ -66,13 +68,36 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   private startStoryProgress() {
-    this.intervalId && this.storyService.clearProgress(this.intervalId);
-    this.intervalId = this.storyService.startProgress(this.PROGRESS_INTERVAL_MS, () => {
-      this.progressWidth += 1;
+    const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
+    let storyDuration = 5000; // Default duration (in milliseconds) for images
+
+    if (currentStory.type === 'video') {
+      const videoElement = document.createElement('video');
+      videoElement.src = currentStory.content;
+
+      // Use the video duration or a default if not available
+      videoElement.onloadedmetadata = () => {
+        storyDuration = videoElement.duration * 1000; // Convert to milliseconds
+        this.startProgressInterval(storyDuration);
+      };
+    } else {
+      // For images, start with default duration
+      this.startProgressInterval(storyDuration);
+    }
+  }
+
+  startProgressInterval(storyDuration: number) {
+    const progressPerTick = this.FULL_PROGRESS_WIDTH / (storyDuration / this.PROGRESS_INTERVAL_MS);
+
+    clearInterval(this.intervalId);
+
+    this.intervalId = setInterval(() => {
+      this.progressWidth += progressPerTick;
       if (this.progressWidth >= this.FULL_PROGRESS_WIDTH) {
+        clearInterval(this.intervalId);
         this.navigateStory('next');
       }
-    });
+    }, this.PROGRESS_INTERVAL_MS);
   }
 
   private initHammer() {
@@ -120,20 +145,60 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   navigateStory(direction: 'next' | 'previous') {
     if (this.isTransitioning) return;
+    this.pauseCurrentVideo(true);  // Pause the video before navigating
     this.setTransitionState(true);
     clearInterval(this.intervalId);
 
     const { storyGroupIndex, storyIndex } =
       direction === 'next'
-        ? this.storyService.nextStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex)
-        : this.storyService.prevStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex);
+        ? this.storyService.nextStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, this.storyGroupChange.bind(this))
+        : this.storyService.prevStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, this.storyGroupChange.bind(this));
 
     this.currentStoryGroupIndex = storyGroupIndex;
     this.currentStoryIndex = storyIndex;
 
     this.progressWidth = 0;
     this.setTransitionState(false, this.HOLD_DELAY_MS);
-    this.startStoryProgress();
+
+    if (this.storyState !== 'paused') {
+      this.storyState = 'playing';
+      this.startStoryProgress();
+      this.playCurrentStoryVideo();
+    }
+  }
+
+  private playCurrentStoryVideo() {
+    setTimeout(() => {
+      const currentStory = this.storyGroups.find((storyGroup, index) => index === this.currentStoryGroupIndex)?.stories[this.currentStoryIndex];
+
+      // If the current story is a video, find the video element and play it
+      if (currentStory?.type === 'video') {
+        const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex]; // Current story group container
+        const activeStoryContent = activeStoryContainer.nativeElement.querySelector('.story-content.active'); // Active story within the group
+        const videoElement: HTMLVideoElement | null = activeStoryContent.querySelector('video');
+
+        if (videoElement) {
+          videoElement.play().catch(err => {
+            console.error(err);
+          })
+        }
+      }
+    }, 0);
+
+  }
+
+  private pauseCurrentVideo(seek: null | boolean = null) {
+    let currentStory = this.storyGroups.find((storyGroup, index) => index === this.currentStoryGroupIndex)?.stories[this.currentStoryIndex];
+    if (currentStory?.type === 'video') {
+      const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex]; // Current story group container
+      const activeStoryContent = activeStoryContainer.nativeElement.querySelector('.story-content.active'); // Active story within the group
+      const videoElement: HTMLVideoElement | null = activeStoryContent.querySelector('video');
+
+      if (videoElement) {
+        videoElement.pause();
+        seek && (videoElement.currentTime = 0);
+      }
+    }
   }
 
   private goToNextStoryGroup() {
@@ -144,6 +209,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.currentStoryIndex = 0;
     clearInterval(this.intervalId);
     this.progressWidth = 0;
+    this.storyGroupChange();
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
@@ -159,6 +225,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       this.currentStoryGroupIndex--;
     }
     this.progressWidth = 0;
+    this.storyGroupChange();
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
@@ -200,13 +267,19 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   onHold() {
     this.isHolding = true;
+    this.storyState = 'paused';
+    this.pauseCurrentVideo();  // Pause the video when holding
     clearInterval(this.intervalId);
   }
 
   onRelease() {
-    this.isHolding = false;
     clearTimeout(this.holdTimeout);  // Cancel hold if user releases before 1 second
-    this.startStoryProgress();
+    if (this.isHolding) {
+      this.isHolding = false;
+      this.storyState = 'playing';
+      this.startStoryProgress();
+      this.playCurrentStoryVideo();  // Resume the video when released
+    }
   }
 
   disableContextMenu(event: MouseEvent) {
@@ -217,8 +290,10 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.storyState = this.storyState === 'paused' ? 'playing' : 'paused';
     if (this.storyState === 'paused') {
       clearInterval(this.intervalId);
+      this.pauseCurrentVideo();
     } else {
       this.startStoryProgress();
+      this.playCurrentStoryVideo();  // Resume the video when released
     }
   }
 
@@ -233,5 +308,9 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   private onSwipeUpTriggered() {
     this.triggerOnSwipeUp.emit();
+  }
+
+  private storyGroupChange(storyGroupIndex: number = this.currentStoryGroupIndex) {
+    this.onStoryGroupChange.emit(storyGroupIndex);
   }
 }

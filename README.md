@@ -1,6 +1,6 @@
 # Ngx Stories
 
-An Angular library for displaying user stories in a carousel format.
+An Angular component to render instagram like stories.
 
 [![npm downloads](https://img.shields.io/npm/dt/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
 [![npm version](https://img.shields.io/npm/v/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
@@ -40,6 +40,7 @@ export class AppComponent {
         name: 'Jane Smith',
         stories: [
           { id: 103, type: 'image', content: 'https://example.com/story3.jpg' },
+          { id: 3, type: 'video', content: 'https://example.com/video-story.mp4' },
         ],
       },
     ];
@@ -58,7 +59,15 @@ export class AppComponent {
 | `triggerOnEnd`     | `EventEmitter<void>`  | No       | Output event that is triggered when the user reaches the end of all stories.                                  |
 | `triggerOnExit`    | `EventEmitter<void>`  | No       | Output event that is triggered when the user manually exits the story view.                                   |
 | `triggerOnSwipeUp` | `EventEmitter<void>`  | No       | Output event that is triggered when the user performs a swipe-up gesture, typically for additional actions.    |
+| `onStoryGroupChange` | `EventEmitter<number>`  | No       | Output event that is triggered when the user changes the storyGroup.
 
+
+```ts
+interface NgxStoriesOptions {
+  width: number,
+  height: number,
+}
+```
 
 ## Features
 * Dynamic Story Carousel: Display a collection of stories for each storyGroup.
@@ -67,6 +76,9 @@ export class AppComponent {
 * Swipe Gestures (Mobile Friendly): Allow users to swipe left or right to navigate through the stories.
 * Hold to Pause: Pause the story progress when the user holds their finger on the screen.
 * Events: Trigger events when the user reaches the end of the stories or when they exit the carousel.
+
+## Contributing
+[Contributing Guide](https://github.com/Gauravdarkslayer/ngx-stories/blob/main/CONTRIBUTING.md)
 
 ## License
 This library is licensed under the MIT License. Feel free to use and modify the code as per your needs.

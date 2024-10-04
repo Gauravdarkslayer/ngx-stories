@@ -18,12 +18,12 @@ export class AppComponent {
   // StoryGroup[] is a list where each story group contains an id, name, and an array of stories
   readonly storyGroups: StoryGroup[] = [
     {
-      id: 1,         // Unique identifier for the first story group
-      name: 'Steve Smith',  // Name of the person or group
-      stories: [     // Array of stories belonging to this group
-        { id: 1, type: 'image', content: 'https://i.ibb.co/ZMVy3KN/pexels-rpnickson-2486168.jpg' }, // Story 1
-        { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg' }, //Story 2
-        { id: 3, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }  //Story 3
+      id: 1,
+      name: 'Steve Smith',
+      stories: [
+        { id: 1, type: 'image', content: 'https://i.ibb.co/ZMVy3KN/pexels-rpnickson-2486168.jpg' },
+        { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg' },
+        { id: 3, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
       ]
     },
     {
@@ -46,5 +46,9 @@ export class AppComponent {
   // Function to trigger an alert when the user exits the stories
   triggerOnExit() {
     alert('Exit');  // Displays an alert with the message "Exit"
+  }
+
+  triggerOnStoryGroupChange(storyGroup: number) {
+    console.log(storyGroup);
   }
 }
