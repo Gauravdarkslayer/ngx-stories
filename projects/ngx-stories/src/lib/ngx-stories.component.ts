@@ -70,11 +70,9 @@ export class NgxStoriesComponent implements AfterViewInit {
   private startStoryProgress() {
     const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
     let storyDuration = 5000; // Default duration (in milliseconds) for images
-
     if (currentStory.type === 'video') {
       const videoElement = document.createElement('video');
       videoElement.src = currentStory.content;
-
       // Use the video duration or a default if not available
       videoElement.onloadedmetadata = () => {
         storyDuration = videoElement.duration * 1000; // Convert to milliseconds
@@ -91,13 +89,13 @@ export class NgxStoriesComponent implements AfterViewInit {
 
     clearInterval(this.intervalId);
 
-    this.intervalId = setInterval(() => {
+    this.intervalId = this.storyService.startProgress(this.PROGRESS_INTERVAL_MS, () => {
       this.progressWidth += progressPerTick;
       if (this.progressWidth >= this.FULL_PROGRESS_WIDTH) {
         clearInterval(this.intervalId);
         this.navigateStory('next');
       }
-    }, this.PROGRESS_INTERVAL_MS);
+    });
   }
 
   private initHammer() {

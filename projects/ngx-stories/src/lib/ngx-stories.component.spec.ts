@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgxStoriesComponent } from './ngx-stories.component';
 import { StoryGroup } from './interfaces/interfaces';
 
@@ -13,13 +13,30 @@ describe('NgxStoriesComponent', () => {
 
     fixture = TestBed.createComponent(NgxStoriesComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create the component', () => {
-    expect(1).toBeTruthy();
+    expect(component).toBeTruthy(); // This checks if the component is created successfully
   });
 
+  it('should start progress interval for an image story', () => {
+    const fixture = TestBed.createComponent(NgxStoriesComponent);
+    const component = fixture.componentInstance;
+
+    component.storyGroups = [{
+      id: 1,
+      name: 'Test Group',
+      stories: [{ id: 1, type: 'image', content: 'image_url.jpg' }]
+    }];
+
+    fixture.detectChanges();
+
+    spyOn(component, 'startProgressInterval');
+    component.startStoryProgress();
+
+    expect(component.startProgressInterval).toHaveBeenCalledWith(5000);  // default duration
+  });
+  
   it('should accept storyGroups input and display stories', () => {
     const mockStoryGroups: StoryGroup[] = [
       {
