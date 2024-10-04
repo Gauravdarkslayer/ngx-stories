@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren, HostListener} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
 import { StoryGroup } from '../lib/interfaces/interfaces';
@@ -65,6 +65,19 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.initHammer();
+  }
+
+  //Use Keyboard Navigations to control the stories 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyPress(event: KeyboardEvent): void {
+    if (event.key === 'ArrowRight') {
+      this.navigateStory('next'); // Move to the next story
+    } else if (event.key === 'ArrowLeft') {
+      this.navigateStory('previous'); // Move to the previous story
+    } else if (event.key === ' ') {
+      event.preventDefault(); 
+      this.togglePause();
+    }
   }
 
   private startStoryProgress() {
