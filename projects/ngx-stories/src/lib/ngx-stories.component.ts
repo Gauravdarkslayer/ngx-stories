@@ -20,7 +20,7 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   // Input property to accept the list of storyGroup and their stories
   @Input({ required: true }) storyGroups: StoryGroup[] = [];
-  // Input property to accept the options for the stories component
+  // options for the story container
   @Input() options: NgxStoriesOptions = {
     width: 360,
     height: 768,
@@ -34,19 +34,20 @@ export class NgxStoriesComponent implements AfterViewInit {
   currentStoryIndex: number = 0;
   currentStoryGroupIndex: number = 0;
   progressWidth: number = 0;
-  intervalId: any;
-  isTransitioning = false; 
+  intervalId: any;//interval id for the progress bar
+  isTransitioning = false; //prevent multiple transitions at once
   isSwipingLeft = false;
   isSwipingRight = false;
   isHolding = false;
-  holdTimeout: any; 
+  holdTimeout: any; //timeout for holding the story(pause functionality)
   storyState: 'playing' | 'paused' | 'holding' = 'playing';
 
-  
+  //constants for the story component
   readonly HOLD_DELAY_MS = 500;
   readonly PROGRESS_INTERVAL_MS = 50;
   readonly FULL_PROGRESS_WIDTH = 100;
 
+  //Queries the story container in the view for gesture for handling swipe events
   @ViewChildren('storyContainer') storyContainers!: QueryList<ElementRef>;
 
   constructor(
@@ -67,15 +68,17 @@ export class NgxStoriesComponent implements AfterViewInit {
 // Function to start the progress bar for the current story
   private startStoryProgress() { 
     const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
-    let storyDuration = 5000;
+    let storyDuration = 5000;//default duration for the story for the images
     if (currentStory.type === 'video') {
       const videoElement = document.createElement('video');
       videoElement.src = currentStory.content;
+      //use the video duration or a default if not available
       videoElement.onloadedmetadata = () => {
         storyDuration = videoElement.duration * 1000;
         this.startProgressInterval(storyDuration);
       };
     } else {
+      //for the ,start with default duration
       this.startProgressInterval(storyDuration);
     }
   }
@@ -117,13 +120,13 @@ export class NgxStoriesComponent implements AfterViewInit {
         }
         this.goToNextStoryGroup();
         this.resetSwipe();
-      }, 600); 
+      }, 600); //Match the animation duration
     } else if (direction === 'right') {
       this.isSwipingRight = true;
       setTimeout(() => {
         this.goToPreviousStoryGroup();
         this.resetSwipe();
-      }, 600); 
+      }, 600); //Match the animation duration
     } else if (direction === 'down') {
       clearInterval(this.intervalId);
       this.onExit();
@@ -139,7 +142,7 @@ export class NgxStoriesComponent implements AfterViewInit {
 // Function to navigate to the next or previous story
   navigateStory(direction: 'next' | 'previous') {
     if (this.isTransitioning) return;
-    this.pauseCurrentVideo(true); 
+    this.pauseCurrentVideo(true); // Pause the video and seek to the beginning
     this.setTransitionState(true);
     clearInterval(this.intervalId);
 
@@ -209,7 +212,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
-    }, this.HOLD_DELAY_MS);
+    }, this.HOLD_DELAY_MS);//Match this timeout with the animation duration
   }
 
   // Function to navigate to the previous story group
@@ -226,7 +229,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     setTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
-    }, this.HOLD_DELAY_MS);
+    }, this.HOLD_DELAY_MS);//Match this timeout with the CSS transition duration
   }
 
   // Function to set the transition state
@@ -234,8 +237,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.isTransitioning = isTransitioning;
     setTimeout(() => {
       this.isTransitioning = false;
-    }, duration); 
-  }
+    }, duration); // Ensure consistent transition timing
 
   // Function to check if the user has reached the end of the stories
   private hasReachedEndOfStories(): boolean {
@@ -278,7 +280,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       this.isHolding = false;
       this.storyState = 'playing';
       this.startStoryProgress();
-      this.playCurrentStoryVideo(); 
+      this.playCurrentStoryVideo(); //Resume the video when released
     }
   }
 
@@ -290,10 +292,10 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.storyState = this.storyState === 'paused' ? 'playing' : 'paused';
     if (this.storyState === 'paused') {
       clearInterval(this.intervalId);
-      this.pauseCurrentVideo();
+      this.pauseCurrentVideo();  // Pause the video when holding
     } else {
       this.startStoryProgress();
-      this.playCurrentStoryVideo();  
+      this.playCurrentStoryVideo();  //resume the video when released
     }
   }
 
@@ -302,6 +304,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   private onExit() {
+    //swipedown event or cross button clicked in the story 
     this.triggerOnExit.emit();
   }
 

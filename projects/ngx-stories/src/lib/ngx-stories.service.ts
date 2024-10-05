@@ -11,6 +11,7 @@ export class NgxStoriesService {
   startProgress(interval: number, callback: () => void): any {
     return setInterval(() => callback(), interval);
   }
+  //Clears the progress interval
   clearProgress(intervalId: any): void {
     clearInterval(intervalId);
   }
@@ -21,10 +22,12 @@ export class NgxStoriesService {
     onStoryGroupChange: (storyGroupIndex: number) => void): { storyGroupIndex: number, storyIndex: number } {
     let stories = storyGroups[currentStoryGroupIndex]?.stories;
     if (currentStoryIndex === stories.length - 1) {
+     // If the current story is the last story in the group, move to the next group
       currentStoryGroupIndex = (currentStoryGroupIndex + 1) % storyGroups.length;
       currentStoryIndex = 0;
       onStoryGroupChange(currentStoryGroupIndex);
     } else {
+      // Otherwise move to the next story in the same group
       currentStoryIndex++;
     }
     return { storyGroupIndex: currentStoryGroupIndex, storyIndex: currentStoryIndex };
@@ -36,6 +39,7 @@ export class NgxStoriesService {
     onStoryGroupChange: (storyGroupIndex: number) => void): { storyGroupIndex: number, storyIndex: number } {
     let stories = storyGroups[currentStoryGroupIndex]?.stories;
     if (currentStoryIndex === 0) {
+      //Move to the previous story group if the current story index is 0
       if (currentStoryGroupIndex > 0) {
         currentStoryGroupIndex--;
         stories = storyGroups[currentStoryGroupIndex]?.stories;
@@ -48,6 +52,7 @@ export class NgxStoriesService {
     return { storyGroupIndex: currentStoryGroupIndex, storyIndex: currentStoryIndex };
   }
  // Set the options for the service
+ // Set the width and height of the story container
   setOptions(options: NgxStoriesOptions, storyContainers: QueryList<ElementRef>): void {  
     storyContainers?.forEach(storyContainer => {
       storyContainer.nativeElement.style.width = options.width + 'px';

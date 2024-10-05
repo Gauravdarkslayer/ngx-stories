@@ -17,7 +17,7 @@ describe('NgxStoriesComponent', () => {
   });
 
   it('should create the component', () => {
-    expect(component).toBeTruthy(); 
+    expect(component).toBeTruthy(); //This checks if the component is created succesfully
   });
 
   it('should start progress interval for an image story', () => {

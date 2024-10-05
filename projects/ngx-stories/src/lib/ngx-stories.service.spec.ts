@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+
 import { NgxStoriesService } from './ngx-stories.service';
 import { StoryGroup } from './interfaces/interfaces';
 
@@ -74,16 +75,16 @@ describe('NgxStoriesService', () => {
 
     // Test to ensure the service moves to the next story within the same storyGroup
     it('should move to the next story within the same storyGroup', () => {
-      const result = service.nextStory(storyGroups, 0, 0, onStoryGroupChangeMock);
+      const result = service.nextStory(storyGroups, 0, 0, onStoryGroupChangeMock);// // Start at storyGroup 0, story 0
       expect(result.storyGroupIndex).toBe(0);
       expect(result.storyIndex).toBe(1);
     });
 
     // Test to ensure the service moves to the next storyGroup when the last story is reached
     it('should move to the next storyGroup if current story is the last one', () => {
-      const result = service.nextStory(storyGroups, 0, 2, onStoryGroupChangeMock); 
-      expect(result.storyGroupIndex).toBe(1); 
-      expect(result.storyIndex).toBe(0); 
+      const result = service.nextStory(storyGroups, 0, 2, onStoryGroupChangeMock); // Start at storyGroup 0, story 2(last story)
+      expect(result.storyGroupIndex).toBe(1); //Move to the next storyGroup
+      expect(result.storyIndex).toBe(0); //first story of the next storyGroup
     });
   });
 
@@ -111,23 +112,23 @@ describe('NgxStoriesService', () => {
 
     // Test to ensure the service moves to the previous story within the same storyGroup
     it('should move to the previous story within the same storyGroup', () => {
-      const result = service.prevStory(storyGroups, 0, 2, onStoryGroupChangeMock);
+      const result = service.prevStory(storyGroups, 0, 2, onStoryGroupChangeMock);// Start at storyGroup 0, story 2
       expect(result.storyGroupIndex).toBe(0);
       expect(result.storyIndex).toBe(1);
     });
 
     // Test to ensure the service moves to the previous storyGroup when the first story is reached
     it('should move to the previous storyGroup if current story is the first one', () => {
-      const result = service.prevStory(storyGroups, 1, 0, onStoryGroupChangeMock);
-      expect(result.storyGroupIndex).toBe(0); 
-      expect(result.storyIndex).toBe(2); 
+      const result = service.prevStory(storyGroups, 1, 0, onStoryGroupChangeMock);// Start at storyGroup 1, story 0
+      expect(result.storyGroupIndex).toBe(0); //Move to the previous storyGroup
+      expect(result.storyIndex).toBe(2); //last story of the previous storyGroup
     });
 
     // Test to ensure that no change occurs if already on the first story of the first storyGroup
     it('should do nothing if on the first story of the first storyGroup', () => {
       const result = service.prevStory(storyGroups, 0, 0, onStoryGroupChangeMock); 
       expect(result.storyGroupIndex).toBe(0);
-      expect(result.storyIndex).toBe(0); 
+      expect(result.storyIndex).toBe(0); //No change rermain on the first story of the first storyGroup
     });
   });
 
