@@ -4,13 +4,13 @@ export interface Story {
     type: StoryType,
     content: string,
 }
-
+// StoryGroup interface
 export interface StoryGroup {
-    id: number, // unique id
-    name: string, // name of the storyGroup which is to be displayed over story
-    stories: Story[] // array of stories
+    id: number,
+    name: string, 
+    stories: Story[] 
 }
-
+// NgxStoriesOptions interface
 export interface NgxStoriesOptions {
     width: number,
     height: number,

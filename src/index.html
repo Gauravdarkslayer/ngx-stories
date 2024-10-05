@@ -12,27 +12,25 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
   <!-- Google Tag Manager -->
-   <!-- Here we are initialising the Google tag manager -->
-<!-- It enable to trcking and analytics on the website  -->
+//for loading the gtm.js script
   <script>(function (w, d, s, l, i) {
-      w[l] = w[l] || []; w[l].push({    //pushing the data to the dataLayer
+      w[l] = w[l] || []; w[l].push({   
         'gtm.start':          
-          new Date().getTime(), event: 'gtm.js' //for the  first script element in the document
+          new Date().getTime(), event: 'gtm.js' 
       }); var f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =  //creating the script element
-          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f); //If the ddatalayer is not equal to dataLayer then it will append the dataLayer to the script element i.e URL
-    })(window, document, 'script', 'dataLayer', 'GTM-KDD8ZZFP'); //passing the window,document,script,dataLayer and the id of the GTM
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =  
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f); 
+    })(window, document, 'script', 'dataLayer', 'GTM-KDD8ZZFP'); 
   </script>
   <!-- End Google Tag Manager -->
 
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-N2X4LE7WXQ"></script> //for loading the gtag.js script
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-N2X4LE7WXQ"></script> 
   <script>
-    window.dataLayer = window.dataLayer || [];   //creating the dataLayer
-    function gtag() { dataLayer.push(arguments); }  //pushing the data to the dataLayer
-    gtag('js', new Date());    //for the  first script element in the document
-
-    gtag('config', 'G-N2X4LE7WXQ');   //passing the id of the GTM
+    window.dataLayer = window.dataLayer || [];   
+    function gtag() { dataLayer.push(arguments); }  
+    gtag('js', new Date());   
+    gtag('config', 'G-N2X4LE7WXQ');  
   </script>
 </head>
 
@@ -41,7 +39,7 @@
 
   <!-- Google Tag Manager (noscript) -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDD8ZZFP" height="0" width="0"  
-      style="display:none;visibility:hidden"></iframe></noscript>  //If the script is not supported by the browser then it will display the message
+      style="display:none;visibility:hidden"></iframe></noscript>  
   <!-- End Google Tag Manager (noscript) -->
 
 </body>

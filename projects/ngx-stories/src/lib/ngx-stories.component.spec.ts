@@ -2,6 +2,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { NgxStoriesComponent } from './ngx-stories.component';
 import { StoryGroup } from './interfaces/interfaces';
 
+// Test suite for the NgxStoriesComponent
 describe('NgxStoriesComponent', () => {
   let component: NgxStoriesComponent;
   let fixture: ComponentFixture<NgxStoriesComponent>;
@@ -16,7 +17,7 @@ describe('NgxStoriesComponent', () => {
   });
 
   it('should create the component', () => {
-    expect(component).toBeTruthy(); // This checks if the component is created successfully
+    expect(component).toBeTruthy(); 
   });
 
   it('should start progress interval for an image story', () => {
@@ -34,7 +35,7 @@ describe('NgxStoriesComponent', () => {
     spyOn(component, 'startProgressInterval');
     component.startStoryProgress();
 
-    expect(component.startProgressInterval).toHaveBeenCalledWith(5000);  // default duration
+    expect(component.startProgressInterval).toHaveBeenCalledWith(5000);  
   });
   
   it('should accept storyGroups input and display stories', () => {
