@@ -78,6 +78,9 @@ export class NgxStoriesComponent implements AfterViewInit {
       event.preventDefault(); 
       this.togglePause();
     }
+    else if (event.key === 'Escape') {
+      this.onExit(); 
+    }
   }
 
   private startStoryProgress() {
