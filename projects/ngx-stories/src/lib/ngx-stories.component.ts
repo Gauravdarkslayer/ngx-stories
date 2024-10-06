@@ -83,7 +83,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.initHammer();
   }
 
-  private startStoryProgress() {
+  startStoryProgress() {
     const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
     let storyDuration = 5000; // Default duration (in milliseconds) for images
     if (currentStory.type === 'video') {
