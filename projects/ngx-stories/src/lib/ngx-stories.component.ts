@@ -254,7 +254,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     setTimeout(() => {
       this.isTransitioning = false;
     }, duration); // Ensure consistent transition timing
-
+  }
   // Function to check if the user has reached the end of the stories
   private hasReachedEndOfStories(): boolean {
     let stories = this.storyGroups.find((storyGroup, index) => index === this.currentStoryGroupIndex)?.stories;
