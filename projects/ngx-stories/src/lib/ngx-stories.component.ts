@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren , HostListener} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
 import { StoryGroup } from '../lib/interfaces/interfaces';
@@ -54,6 +54,22 @@ export class NgxStoriesComponent implements AfterViewInit {
     private storyService: NgxStoriesService
   ) { }
 
+
+   //Use Keyboard Navigations to control the stories
+   @HostListener('document:keydown', ['$event'])
+   handleKeyPress(event: KeyboardEvent): void {
+     if (event.key === 'ArrowRight') {
+       this.navigateStory('next'); // Move to the next story
+     } else if (event.key === 'ArrowLeft') {
+       this.navigateStory('previous'); // Move to the previous story
+     } else if (event.key === ' ') {
+       event.preventDefault();
+       this.togglePause();
+     } else if (event.key === 'Escape') {
+       this.onExit();
+     }
+   }
+ 
   ngOnInit(): void {
     this.startStoryProgress();
   }
@@ -65,8 +81,8 @@ export class NgxStoriesComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.initHammer();
   }
-// Function to start the progress bar for the current story
-  private startStoryProgress() { 
+
+  private startStoryProgress() {
     const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
     let storyDuration = 5000;//default duration for the story for the images
     if (currentStory.type === 'video') {
