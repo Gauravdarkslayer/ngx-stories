@@ -24,9 +24,13 @@ export class NgxStoriesService {
     let stories = storyGroups[currentStoryGroupIndex]?.stories;
     if (currentStoryIndex === stories.length - 1) {
       // Move to the next storyGroup if the current story index is the last
-      currentStoryGroupIndex = (currentStoryGroupIndex + 1) % storyGroups.length;
+      currentStoryGroupIndex = currentStoryGroupIndex + 1;
       currentStoryIndex = 0;
-      onStoryGroupChange(currentStoryGroupIndex);
+
+      if (currentStoryGroupIndex < storyGroups.length) {
+        onStoryGroupChange(currentStoryGroupIndex);
+      }
+
     } else {
       // Otherwise, just move to the next story within the same storyGroup
       currentStoryIndex++;
