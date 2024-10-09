@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren , HostListener} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren, HostListener } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
 import { StoryGroup } from '../lib/interfaces/interfaces';
@@ -56,21 +56,21 @@ export class NgxStoriesComponent implements AfterViewInit {
   ) { }
 
 
-   //Use Keyboard Navigations to control the stories
-   @HostListener('document:keydown', ['$event'])
-   handleKeyPress(event: KeyboardEvent): void {
-     if (event.key === 'ArrowRight') {
-       this.navigateStory('next'); // Move to the next story
-     } else if (event.key === 'ArrowLeft') {
-       this.navigateStory('previous'); // Move to the previous story
-     } else if (event.key === ' ') {
-       event.preventDefault();
-       this.togglePause();
-     } else if (event.key === 'Escape') {
-       this.onExit();
-     }
-   }
- 
+  //Use Keyboard Navigations to control the stories
+  @HostListener('document:keydown', ['$event'])
+  handleKeyPress(event: KeyboardEvent): void {
+    if (event.key === 'ArrowRight') {
+      this.navigateStory('next'); // Move to the next story
+    } else if (event.key === 'ArrowLeft') {
+      this.navigateStory('previous'); // Move to the previous story
+    } else if (event.key === ' ') {
+      event.preventDefault();
+      this.togglePause();
+    } else if (event.key === 'Escape') {
+      this.onExit();
+    }
+  }
+
   ngOnInit(): void {
     this.startStoryProgress();
   }
@@ -170,6 +170,12 @@ export class NgxStoriesComponent implements AfterViewInit {
 
     this.currentStoryGroupIndex = storyGroupIndex;
     this.currentStoryIndex = storyIndex;
+
+    //Trigger onEnd emitter when all the storieGroups are traversed.
+    if (this.currentStoryGroupIndex === this.storyGroups.length) {
+      this.onEnd();
+      return;
+    }
 
     this.progressWidth = 0;
     this.setTransitionState(false, this.HOLD_DELAY_MS);
