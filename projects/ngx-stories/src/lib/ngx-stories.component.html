@@ -16,7 +16,7 @@
     </div>
     <div class="story-main-content-container">
       @if(story.type === 'image') {
-      <div class="img-story">
+      <div [ngStyle]="{ 'background-color': backlitColor }" class="img-story">
         <img [src]="story.content" alt="user story">
       </div>
       } @else if(story.type === 'video') {
