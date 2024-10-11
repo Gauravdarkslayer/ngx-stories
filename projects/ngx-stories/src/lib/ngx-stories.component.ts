@@ -20,6 +20,7 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   // Input property to accept the list of storyGroup and their stories
   @Input({ required: true }) storyGroups: StoryGroup[] = [];
+  @Input() backlitColor: string = '#1b1b1b';
 
   // options
   @Input() options: NgxStoriesOptions = {
