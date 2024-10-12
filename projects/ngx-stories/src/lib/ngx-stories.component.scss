@@ -1,6 +1,6 @@
 .story-container {
   position: relative;
-  overflow: hidden;
+  // overflow: hidden;
   border-radius: 10px;
   opacity: 0;
   display: none;
@@ -154,6 +154,31 @@ button:nth-child(1) {
     max-width: 100%;
     max-height: 100%;
     object-fit: cover;
+  }
+}
+
+// Desktop navigation style
+.desktop-navigation {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  visibility: hidden;
+  pointer-events: none;
+
+  &.next-btn {
+    right: -2rem;
+  }
+
+  &.prev-btn {
+    left: -2rem;
+  }
+}
+
+// Navigation visible for desktop only
+@media (min-width: 1024px) {
+  .desktop-navigation {
+    visibility: visible;
+    pointer-events: all;
   }
 }
 
