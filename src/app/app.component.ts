@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NgxStoriesComponent, StoryGroup } from '../../projects/ngx-stories/src/public-api';
+import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projects/ngx-stories/src/public-api';
 
 @Component({
   selector: 'app-root',
@@ -31,6 +31,14 @@ export class AppComponent {
       ]
     },
   ];
+
+  ngxOptions: NgxStoriesOptions = {
+    width: 360,
+    height: 768,
+    currentStoryIndex: 0,
+    currentStoryGroupIndex: 0
+  }
+
 
   triggerOnEnd() {
     alert('End');

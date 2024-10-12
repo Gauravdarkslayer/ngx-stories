@@ -26,6 +26,8 @@ export class NgxStoriesComponent implements AfterViewInit {
   @Input() options: NgxStoriesOptions = {
     width: 360,
     height: 768,
+    currentStoryIndex: 0,
+    currentStoryGroupIndex: 0
   };
   // Output events to handle end of stories, exit, and swipe-up gesture
   @Output() triggerOnEnd = triggerOnEnd;
@@ -73,6 +75,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.setInitialStoryIndex();
     this.startStoryProgress();
   }
 
@@ -99,6 +102,12 @@ export class NgxStoriesComponent implements AfterViewInit {
       // For images, start with default duration
       this.startProgressInterval(storyDuration);
     }
+  }
+
+  private setInitialStoryIndex() {
+    //Set the index for the story view to start with.
+    this.currentStoryIndex = this.options.currentStoryIndex;
+    this.currentStoryGroupIndex = this.options.currentStoryGroupIndex;
   }
 
   startProgressInterval(storyDuration: number) {
