@@ -9,6 +9,10 @@ import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projec
   styleUrl: './app.component.css',
 })
 export class AppComponent {
+  storyOptions: NgxStoriesOptions = {
+    width: 380,
+    height: 768,
+  };
   readonly storyGroups: StoryGroup[] = [
     {
       id: 1,
@@ -41,11 +45,11 @@ export class AppComponent {
 
 
   triggerOnEnd() {
-    alert('End');
+    console.log('End');
   }
 
   triggerOnExit() {
-    alert('Exit');
+    console.log('Exit');
   }
 
   triggerOnStoryGroupChange(storyGroup: number) {
