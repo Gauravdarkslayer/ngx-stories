@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NgxStoriesComponent, StoryGroup } from '../../projects/ngx-stories/src/public-api';
+import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projects/ngx-stories/src/public-api';
 
 @Component({
   selector: 'app-root',
@@ -9,6 +9,10 @@ import { NgxStoriesComponent, StoryGroup } from '../../projects/ngx-stories/src/
   styleUrl: './app.component.css',
 })
 export class AppComponent {
+  storyOptions: NgxStoriesOptions = {
+    width: 380,
+    height: 768,
+  };
   readonly storyGroups: StoryGroup[] = [
     {
       id: 1,
@@ -33,11 +37,11 @@ export class AppComponent {
   ];
 
   triggerOnEnd() {
-    alert('End');
+    console.log('End');
   }
 
   triggerOnExit() {
-    alert('Exit');
+    console.log('Exit');
   }
 
   triggerOnStoryGroupChange(storyGroup: number) {
