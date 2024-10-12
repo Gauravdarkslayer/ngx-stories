@@ -163,15 +163,26 @@ button:nth-child(1) {
   cursor: pointer;
   position: absolute;
   top: 50%;
+  border-radius: 50% !important;
+  background-color: #d5d5d5 !important;
+  width: 48px;
+  height: 48px;
   visibility: hidden;
   pointer-events: none;
+  background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none"><path stroke="%23000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="m21.52 16.22 7.75 7.75m-7.75 7.78L29.27 24"/></svg>');
 
   &.next-btn {
-    right: -2rem;
+    right: -4rem;
   }
 
   &.prev-btn {
-    left: -2rem;
+    left: -4rem;
+    transform: rotate(180deg) !important;
+
+    &.disabled {
+      opacity: 40%;
+      pointer-events: none;
+    }
   }
 }
 
