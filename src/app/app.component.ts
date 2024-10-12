@@ -12,6 +12,8 @@ export class AppComponent {
   storyOptions: NgxStoriesOptions = {
     width: 380,
     height: 768,
+    currentStoryIndex: 0,
+    currentStoryGroupIndex: 0
   };
   readonly storyGroups: StoryGroup[] = [
     {
@@ -35,14 +37,6 @@ export class AppComponent {
       ]
     },
   ];
-
-  ngxOptions: NgxStoriesOptions = {
-    width: 360,
-    height: 768,
-    currentStoryIndex: 0,
-    currentStoryGroupIndex: 0
-  }
-
 
   triggerOnEnd() {
     console.log('End');
