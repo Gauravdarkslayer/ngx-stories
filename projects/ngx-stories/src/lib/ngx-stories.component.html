@@ -14,8 +14,12 @@
           [alt]="storyState==='paused' ? 'play-icon' : 'pause-icon'" width="20" height="20">
       </button>
     </div>
-    <div class="story-image-container">
-      <img [src]="story.content" alt="user story">
+    <div class="story-main-content-container">
+      @if(story.type === 'image') {
+        <img [src]="story.content" alt="user story">
+      } @else if(story.type === 'video') {
+        <video [src]="story.content" muted playsinline></video>
+      }
     </div>
   </div>
   }

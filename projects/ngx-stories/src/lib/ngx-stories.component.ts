@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren , HostListener} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
 import { StoryGroup } from '../lib/interfaces/interfaces';
@@ -55,6 +55,22 @@ export class NgxStoriesComponent implements AfterViewInit {
     private storyService: NgxStoriesService
   ) { }
 
+
+   //Use Keyboard Navigations to control the stories
+   @HostListener('document:keydown', ['$event'])
+   handleKeyPress(event: KeyboardEvent): void {
+     if (event.key === 'ArrowRight') {
+       this.navigateStory('next'); // Move to the next story
+     } else if (event.key === 'ArrowLeft') {
+       this.navigateStory('previous'); // Move to the previous story
+     } else if (event.key === ' ') {
+       event.preventDefault();
+       this.togglePause();
+     } else if (event.key === 'Escape') {
+       this.onExit();
+     }
+   }
+ 
   ngOnInit(): void {
     this.startStoryProgress();
   }
@@ -68,10 +84,31 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   private startStoryProgress() {
-    this.intervalId && this.storyService.clearProgress(this.intervalId);
+    const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
+    let storyDuration = 5000; // Default duration (in milliseconds) for images
+    if (currentStory.type === 'video') {
+      const videoElement = document.createElement('video');
+      videoElement.src = currentStory.content;
+      // Use the video duration or a default if not available
+      videoElement.onloadedmetadata = () => {
+        storyDuration = videoElement.duration * 1000; // Convert to milliseconds
+        this.startProgressInterval(storyDuration);
+      };
+    } else {
+      // For images, start with default duration
+      this.startProgressInterval(storyDuration);
+    }
+  }
+
+  startProgressInterval(storyDuration: number) {
+    const progressPerTick = this.FULL_PROGRESS_WIDTH / (storyDuration / this.PROGRESS_INTERVAL_MS);
+
+    clearInterval(this.intervalId);
+
     this.intervalId = this.storyService.startProgress(this.PROGRESS_INTERVAL_MS, () => {
-      this.progressWidth += 1;
+      this.progressWidth += progressPerTick;
       if (this.progressWidth >= this.FULL_PROGRESS_WIDTH) {
+        clearInterval(this.intervalId);
         this.navigateStory('next');
       }
     });
@@ -122,6 +159,7 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   navigateStory(direction: 'next' | 'previous') {
     if (this.isTransitioning) return;
+    this.pauseCurrentVideo(true);  // Pause the video before navigating
     this.setTransitionState(true);
     clearInterval(this.intervalId);
 
@@ -139,6 +177,41 @@ export class NgxStoriesComponent implements AfterViewInit {
     if (this.storyState !== 'paused') {
       this.storyState = 'playing';
       this.startStoryProgress();
+      this.playCurrentStoryVideo();
+    }
+  }
+
+  private playCurrentStoryVideo() {
+    setTimeout(() => {
+      const currentStory = this.storyGroups.find((storyGroup, index) => index === this.currentStoryGroupIndex)?.stories[this.currentStoryIndex];
+
+      // If the current story is a video, find the video element and play it
+      if (currentStory?.type === 'video') {
+        const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex]; // Current story group container
+        const activeStoryContent = activeStoryContainer.nativeElement.querySelector('.story-content.active'); // Active story within the group
+        const videoElement: HTMLVideoElement | null = activeStoryContent.querySelector('video');
+
+        if (videoElement) {
+          videoElement.play().catch(err => {
+            console.error(err);
+          })
+        }
+      }
+    }, 0);
+
+  }
+
+  private pauseCurrentVideo(seek: null | boolean = null) {
+    let currentStory = this.storyGroups.find((storyGroup, index) => index === this.currentStoryGroupIndex)?.stories[this.currentStoryIndex];
+    if (currentStory?.type === 'video') {
+      const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex]; // Current story group container
+      const activeStoryContent = activeStoryContainer.nativeElement.querySelector('.story-content.active'); // Active story within the group
+      const videoElement: HTMLVideoElement | null = activeStoryContent.querySelector('video');
+
+      if (videoElement) {
+        videoElement.pause();
+        seek && (videoElement.currentTime = 0);
+      }
     }
   }
 
@@ -209,6 +282,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   onHold() {
     this.isHolding = true;
     this.storyState = 'paused';
+    this.pauseCurrentVideo();  // Pause the video when holding
     clearInterval(this.intervalId);
   }
 
@@ -218,6 +292,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       this.isHolding = false;
       this.storyState = 'playing';
       this.startStoryProgress();
+      this.playCurrentStoryVideo();  // Resume the video when released
     }
   }
 
@@ -229,8 +304,10 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.storyState = this.storyState === 'paused' ? 'playing' : 'paused';
     if (this.storyState === 'paused') {
       clearInterval(this.intervalId);
+      this.pauseCurrentVideo();
     } else {
       this.startStoryProgress();
+      this.playCurrentStoryVideo();  // Resume the video when released
     }
   }
 
