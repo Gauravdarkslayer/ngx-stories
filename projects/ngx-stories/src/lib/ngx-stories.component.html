@@ -39,5 +39,14 @@
   <button class="prev" (click)="navigateStory('previous')">Previous</button>
   }
   <button class="next" (click)="navigateStory('next')">Next</button>
+
+
+  <!-- Next button -->
+  <button class="desktop-navigation next-btn" role="button" tabindex="0" (click)="navigateStory('next')"></button>
+
+  <!-- Previous button -->
+  <button class="desktop-navigation prev-btn" role="button" tabindex="0" (click)="navigateStory('previous')"
+    [ngClass]="{ 'disabled': (currentStoryGroupIndex === 0 && currentStoryIndex === 0) }"></button>
+
 </div>
 }
