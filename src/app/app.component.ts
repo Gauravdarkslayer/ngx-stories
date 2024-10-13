@@ -10,8 +10,10 @@ import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projec
 })
 export class AppComponent {
   storyOptions: NgxStoriesOptions = {
-    width: 380,
-    height: 768,
+    width: 338,
+    height: 600,
+    currentStoryIndex: 0,
+    currentStoryGroupIndex: 0
   };
   readonly storyGroups: StoryGroup[] = [
     {
