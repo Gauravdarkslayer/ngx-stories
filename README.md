@@ -66,6 +66,8 @@ export class AppComponent {
 interface NgxStoriesOptions {
   width: number,
   height: number,
+  currentStoryIndex: 0,
+  currentStoryGroupIndex: 0
 }
 ```
 
