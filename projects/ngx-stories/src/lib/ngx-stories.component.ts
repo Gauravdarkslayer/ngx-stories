@@ -5,7 +5,7 @@ import { StoryGroup } from '../lib/interfaces/interfaces';
 import { CommonModule } from '@angular/common';
 import { NgxStoriesService } from './ngx-stories.service';
 import { NgxStoriesOptions } from '../lib/interfaces/interfaces';
-import { onStoryGroupChange, triggerOnEnd, triggerOnExit, triggerOnSwipeUp } from './utils/story-event-emitters';
+import { onStoryGroupChange, triggerOnEnd, triggerOnExit, triggerOnStoryChange, triggerOnSwipeUp } from './utils/story-event-emitters';
 import "hammerjs";
 
 @Component({
@@ -31,6 +31,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   @Output() triggerOnExit = triggerOnExit;
   @Output() triggerOnSwipeUp = triggerOnSwipeUp;
   @Output() onStoryGroupChange = onStoryGroupChange;
+  @Output() triggerOnStoryChange = triggerOnStoryChange;
 
   currentStoryIndex: number = 0;
   currentStoryGroupIndex: number = 0;
@@ -98,6 +99,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       // For images, start with default duration
       this.startProgressInterval(storyDuration);
     }
+    this.populateCurrentDetails(this.currentStoryIndex, this.currentStoryGroupIndex)
   }
 
   startProgressInterval(storyDuration: number) {
@@ -167,9 +169,9 @@ export class NgxStoriesComponent implements AfterViewInit {
       direction === 'next'
         ? this.storyService.nextStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, this.storyGroupChange.bind(this))
         : this.storyService.prevStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, this.storyGroupChange.bind(this));
-
-    this.currentStoryGroupIndex = storyGroupIndex;
-    this.currentStoryIndex = storyIndex;
+        
+        this.currentStoryGroupIndex = storyGroupIndex;
+        this.currentStoryIndex = storyIndex;
 
     this.progressWidth = 0;
     this.setTransitionState(false, this.HOLD_DELAY_MS);
@@ -326,5 +328,20 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   private storyGroupChange(storyGroupIndex: number = this.currentStoryGroupIndex) {
     this.onStoryGroupChange.emit(storyGroupIndex);
+  }
+  private populateCurrentDetails(currentSIndex: number, currentSGIndex: number) {
+    try {
+      const dataToSend =  {
+        currentPerson: this.storyGroups[currentSGIndex].name,
+        currentPersonIndex: currentSGIndex,
+        currentStory: this.storyGroups[currentSGIndex].stories[currentSIndex],
+        currentStoryIndex: currentSIndex,
+        previousStory: currentSIndex !== 0 ? this.storyGroups[currentSGIndex].stories[currentSIndex -1] : null,
+        previousStoryIndex: currentSIndex !== 0 ? currentSIndex : null
+      }
+      this.triggerOnStoryChange.emit(dataToSend);
+    } catch(error) {
+      console.error(error);
+    }
   }
 }

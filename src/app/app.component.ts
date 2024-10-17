@@ -43,4 +43,7 @@ export class AppComponent {
   triggerOnStoryGroupChange(storyGroup: number) {
     console.log(storyGroup);
   }
+  currentStoryDetails(eventData: object) {
+    console.log('dataToShow', eventData);
+  }
 }
