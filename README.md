@@ -56,6 +56,7 @@ export class AppComponent {
 |--------------------|-----------------------|----------|--------------------------------------------------------------------------------------------------------------|
 | `storyGroups`      | `StoryGroup[]`        | Yes      | An input property that accepts an array of story groups. Each group contains a list of stories to display.     |
 | `options`          | `NgxStoriesOptions`   | No       | Configuration options for the story display. Options include `width` and `height` to customize the dimensions. |
+| `backlitColor`          | `String`   | No       | Background color for stories by default it's `#1b1b1b`. |
 | `triggerOnEnd`     | `EventEmitter<void>`  | No       | Output event that is triggered when the user reaches the end of all stories.                                  |
 | `triggerOnExit`    | `EventEmitter<void>`  | No       | Output event that is triggered when the user manually exits the story view.                                   |
 | `triggerOnSwipeUp` | `EventEmitter<void>`  | No       | Output event that is triggered when the user performs a swipe-up gesture, typically for additional actions.    |
