@@ -1,6 +1,6 @@
 .story-container {
   position: relative;
-  overflow: hidden;
+  // overflow: hidden;
   border-radius: 10px;
   opacity: 0;
   display: none;
@@ -109,7 +109,7 @@ button:nth-child(1) {
   display: flex;
   position: absolute;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   flex-direction: column;
   backface-visibility: hidden;
   transition: transform 0.6s ease-in-out;
@@ -137,6 +137,9 @@ button:nth-child(1) {
   justify-content: space-between;
   align-items: center;
   z-index: 1;
+  h5{
+    color: white;
+  }
 
   button {
     display: none;
@@ -149,11 +152,57 @@ button:nth-child(1) {
   align-items: center;
   justify-content: center;
   position: absolute;
+  height: inherit;
 
   * {
     max-width: 100%;
     max-height: 100%;
     object-fit: cover;
+  }
+}
+
+// Desktop navigation style
+.desktop-navigation {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  border-radius: 50% !important;
+  background-color: #d5d5d5 !important;
+  width: 48px;
+  height: 48px;
+  visibility: hidden;
+  pointer-events: none;
+  transform: none;
+  background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none"><path stroke="%23000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="m21.52 16.22 7.75 7.75m-7.75 7.78L29.27 24"/></svg>');
+
+  &.next-btn {
+    right: -4rem;
+  }
+
+  &.prev-btn {
+    left: -4rem;
+    transform: rotate(180deg) !important;
+
+    &.disabled {
+      opacity: 40%;
+      pointer-events: none;
+    }
+  }
+}
+
+.story-style {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: inherit;
+  width: inherit;
+}
+
+// Navigation visible for desktop only
+@media (min-width: 1024px) {
+  .desktop-navigation {
+    visibility: visible;
+    pointer-events: all;
   }
 }
 
