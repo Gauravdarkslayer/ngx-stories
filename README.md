@@ -65,10 +65,10 @@ export class AppComponent {
 
 ```ts
 interface NgxStoriesOptions {
-  width: number,
-  height: number,
-  currentStoryIndex: 0,
-  currentStoryGroupIndex: 0
+  width: number, // width of story
+  height: number, // height of story
+  currentStoryIndex: 0, // index from where stories should start
+  currentStoryGroupIndex: 0 // index from where story group should start
 }
 ```
 
@@ -79,6 +79,7 @@ interface NgxStoriesOptions {
 * Swipe Gestures (Mobile Friendly): Allow users to swipe left or right to navigate through the stories.
 * Hold to Pause: Pause the story progress when the user holds their finger on the screen.
 * Events: Trigger events when the user reaches the end of the stories or when they exit the carousel.
+* Keyboard navigation
 
 ## Contributing
 [Contributing Guide](https://github.com/Gauravdarkslayer/ngx-stories/blob/main/CONTRIBUTING.md)
