@@ -56,6 +56,7 @@ export class AppComponent {
 |--------------------|-----------------------|----------|--------------------------------------------------------------------------------------------------------------|
 | `storyGroups`      | `StoryGroup[]`        | Yes      | An input property that accepts an array of story groups. Each group contains a list of stories to display.     |
 | `options`          | `NgxStoriesOptions`   | No       | Configuration options for the story display. Options include `width` and `height` to customize the dimensions. |
+| `backlitColor`          | `String`   | No       | Background color for stories by default it's `#1b1b1b`. |
 | `triggerOnEnd`     | `EventEmitter<void>`  | No       | Output event that is triggered when the user reaches the end of all stories.                                  |
 | `triggerOnExit`    | `EventEmitter<void>`  | No       | Output event that is triggered when the user manually exits the story view.                                   |
 | `triggerOnSwipeUp` | `EventEmitter<void>`  | No       | Output event that is triggered when the user performs a swipe-up gesture, typically for additional actions.    |
@@ -64,8 +65,10 @@ export class AppComponent {
 
 ```ts
 interface NgxStoriesOptions {
-  width: number,
-  height: number,
+  width: number, // width of story
+  height: number, // height of story
+  currentStoryIndex: 0, // index from where stories should start
+  currentStoryGroupIndex: 0 // index from where story group should start
 }
 ```
 
@@ -76,6 +79,7 @@ interface NgxStoriesOptions {
 * Swipe Gestures (Mobile Friendly): Allow users to swipe left or right to navigate through the stories.
 * Hold to Pause: Pause the story progress when the user holds their finger on the screen.
 * Events: Trigger events when the user reaches the end of the stories or when they exit the carousel.
+* Keyboard navigation
 
 ## Contributing
 [Contributing Guide](https://github.com/Gauravdarkslayer/ngx-stories/blob/main/CONTRIBUTING.md)
