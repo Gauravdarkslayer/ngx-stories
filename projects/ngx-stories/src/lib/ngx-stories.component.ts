@@ -45,8 +45,9 @@ export class NgxStoriesComponent implements AfterViewInit {
   isSwipingRight = false;
   isHolding = false;
   holdTimeout: any; // Timeout for holding the story (pause functionality)
-  storyState: 'playing' | 'paused' | 'holding' = 'playing';
-
+  storyState: 'playing' | 'paused' | 'holding' | 'buffering' = 'playing';
+  isLoading: boolean = false;
+  currentProgressWidth: number = 0;
   // constants
   readonly HOLD_DELAY_MS = 500;
   readonly PROGRESS_INTERVAL_MS = 50;
@@ -89,19 +90,35 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   startStoryProgress() {
+    this.onContentBuffering(); // Set loading to true initially
     const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
     let storyDuration = 5000; // Default duration (in milliseconds) for images
     if (currentStory.type === 'video') {
       const videoElement = document.createElement('video');
       videoElement.src = currentStory.content;
+      videoElement.muted = true;
       // Use the video duration or a default if not available
       videoElement.onloadedmetadata = () => {
+        this.onContentLoaded(); // Call when metadata is loaded
         storyDuration = videoElement.duration * 1000; // Convert to milliseconds
         this.startProgressInterval(storyDuration);
       };
     } else {
-      // For images, start with default duration
-      this.startProgressInterval(storyDuration);
+      // Handling for images
+      const imageElement = document.createElement('img');
+      imageElement.src = currentStory.content;
+
+      // Check if the image is cached
+      if (this.storyService.isImageCached(currentStory.content)) {
+        this.onContentLoaded(); // Call immediately if cached
+        this.startProgressInterval(storyDuration); // Use default image duration
+      } else {
+        imageElement.onload = () => {
+          this.onContentLoaded(); // Call on image load event
+          this.startProgressInterval(storyDuration); // Use default image duration
+        };
+      }
+
     }
     this.populateCurrentDetails(this.currentStoryIndex, this.currentStoryGroupIndex)
   }
@@ -118,7 +135,10 @@ export class NgxStoriesComponent implements AfterViewInit {
     clearInterval(this.intervalId);
 
     this.intervalId = this.storyService.startProgress(this.PROGRESS_INTERVAL_MS, () => {
-      this.progressWidth += progressPerTick;
+      if (!this.isLoading) {
+        // Don't increase the progress width if the story is loading
+        this.progressWidth += progressPerTick;
+      }
       if (this.progressWidth >= this.FULL_PROGRESS_WIDTH) {
         clearInterval(this.intervalId);
         this.navigateStory('next');
@@ -359,5 +379,21 @@ export class NgxStoriesComponent implements AfterViewInit {
     } catch(error) {
       console.error(error);
     }
+  }
+
+  // When content (image or video) has loaded
+  onContentLoaded() {
+    this.isLoading = false;
+  }
+
+  // When content is buffering/loading
+  onContentBuffering() {
+    this.isLoading = true;
+  }
+
+  // If there's an error loading content
+  onContentError() {
+    console.error('Error loading content');
+    this.isLoading = false;
   }
 }

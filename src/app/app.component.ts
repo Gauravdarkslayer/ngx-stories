@@ -21,9 +21,10 @@ export class AppComponent {
       name: 'Steve Smith',
       stories: [
         { id: 1, type: 'image', content: 'https://i.ibb.co/ZMVy3KN/pexels-rpnickson-2486168.jpg' },
-        { id: 2, type: 'video', content: 'https://videos.pexels.com/video-files/3468587/3468587-uhd_1440_2560_30fps.mp4' },
+        { id: 2, type: 'video', content: 'https://videos.pexels.com/video-files/19063801/19063801-uhd_2560_1440_60fps.mp4' },
         { id: 3, type: 'video', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-        { id: 4, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
+        { id: 4, type: 'video', content: 'https://videos.pexels.com/video-files/13953067/13953067-hd_1080_1920_30fps.mp4' },
+        { id: 5, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
       ]
     },
     {
@@ -32,8 +33,9 @@ export class AppComponent {
       stories: [
         { id: 1, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/4.jpg' },
         { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/5.jpg' },
-        { id: 3, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/6.jpg' },
-        { id: 4, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/7.jpg' }
+        { id: 3, type: 'video', content: 'https://videos.pexels.com/video-files/28759029/12469290_1920_1080_25fps.mp4' },
+        { id: 4, type: 'video', content: 'https://videos.pexels.com/video-files/28985119/12537126_1920_1080_24fps.mp4' },
+        { id: 5, type: 'video', content: 'https://videos.pexels.com/video-files/28496760/12399731_1440_2560_30fps.mp4' }
       ]
     },
   ];
@@ -47,9 +49,10 @@ export class AppComponent {
   }
 
   triggerOnStoryGroupChange(storyGroup: number) {
-    console.log(storyGroup);
+    console.log('currentStoryGroupDetails',storyGroup);
   }
+
   currentStoryDetails(eventData: object) {
-    console.log('dataToShow', eventData);
+    console.log('currentStoryDetails', eventData);
   }
 }
