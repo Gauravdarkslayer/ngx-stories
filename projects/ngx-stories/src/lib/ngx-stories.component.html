@@ -10,18 +10,39 @@
         {{storyGroup.name}}
       </h5>
       <button (click)="togglePause()">
-        <img [ngClass]="{ 'pause-icon': storyState==='paused', 'play-icon': storyState==='playing' }"
+        <img
+          [ngClass]="{ 'pause-icon': storyState==='paused', 'play-icon': storyState==='playing'  || storyState==='buffering'}"
           [alt]="storyState==='paused' ? 'play-icon' : 'pause-icon'" width="20" height="20">
       </button>
+    </div>
+    <!-- Loading spinner -->
+    <div *ngIf="isLoading" class="loading-spinner">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="50" height="50">
+        <radialGradient id="a12" cx=".66" fx=".66" cy=".3125" fy=".3125" gradientTransform="scale(1.5)">
+          <stop offset="0" stop-color="#FFFFFF"></stop>
+          <stop offset=".3" stop-color="#FFFFFF" stop-opacity=".9"></stop>
+          <stop offset=".6" stop-color="#FFFFFF" stop-opacity=".6"></stop>
+          <stop offset=".8" stop-color="#FFFFFF" stop-opacity=".3"></stop>
+          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop>
+        </radialGradient>
+        <circle transform-origin="center" fill="none" stroke="url(#a12)" stroke-width="15" stroke-linecap="round"
+          stroke-dasharray="200 1000" stroke-dashoffset="0" cx="100" cy="100" r="70">
+          <animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="2" values="360;0"
+            keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform>
+        </circle>
+        <circle transform-origin="center" fill="none" opacity=".2" stroke="#FFFFFF" stroke-width="15"
+          stroke-linecap="round" cx="100" cy="100" r="70"></circle>
+      </svg>
     </div>
     <div class="story-main-content-container">
       @if(story.type === 'image') {
       <div [ngStyle]="{ 'background-color': backlitColor }" class="story-style">
-        <img [src]="story.content" alt="user story">
+        <img [src]="story.content" alt="user story" (load)="onContentLoaded()" (error)="onContentError()">
       </div>
       } @else if(story.type === 'video') {
       <div [ngStyle]="{ 'background-color': backlitColor }" class="story-style">
-        <video [src]="story.content" muted playsinline></video>
+        <video [src]="story.content" muted playsinline muted playsinline (loadeddata)="onContentLoaded()"
+          (waiting)="onContentBuffering()" (playing)="onContentLoaded()"></video>
       </div>
       }
     </div>

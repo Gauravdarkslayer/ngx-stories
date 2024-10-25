@@ -198,6 +198,14 @@ button:nth-child(1) {
   width: inherit;
 }
 
+.loading-spinner {
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 // Navigation visible for desktop only
 @media (min-width: 1024px) {
   .desktop-navigation {

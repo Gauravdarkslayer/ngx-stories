@@ -67,4 +67,11 @@ export class NgxStoriesService {
     });
 
   }
+
+  isImageCached(src: string): boolean {
+    const img = new Image();
+    img.src = src;
+    return img.complete;
+  }
+  
 }
