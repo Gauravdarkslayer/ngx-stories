@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren, ViewContainerRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
 import { Person } from '../lib/interfaces/interfaces';
@@ -11,14 +11,14 @@ import { NgxStoriesService } from './ngx-stories.service';
   standalone: true,
   imports: [RouterOutlet, HammerModule, CommonModule],
   templateUrl: './ngx-stories.component.html',
-  styleUrl: './ngx-stories.component.scss',
+  styleUrls: ['./ngx-stories.component.scss'],
 })
-export class NgxStoriesComponent implements AfterViewInit {
+export class NgxStoriesComponent implements AfterViewInit, OnInit {
   title = 'ngx-stories';
-  
+
   // Input property to accept the list of persons and their stories
   @Input({ required: true }) persons: Person[] = [];
-  
+
   // Output events to handle end of stories, exit, and swipe-up gesture
   @Output() triggerOnEnd = new EventEmitter<void>();
   @Output() triggerOnExit = new EventEmitter<void>();
@@ -39,7 +39,8 @@ export class NgxStoriesComponent implements AfterViewInit {
   @ViewChildren('storyContainer') storyContainers!: QueryList<ElementRef>;
 
   constructor(
-    private storyService: NgxStoriesService
+    private storyService: NgxStoriesService,
+    private viewContainerRef: ViewContainerRef // Inject ViewContainerRef
   ) { }
 
   ngOnInit(): void {
@@ -52,6 +53,37 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.initHammer();
+    this.loadCurrentStory(); // Load the initial story after view init
+  }
+
+  loadCurrentStory() {
+    const currentStory = this.persons[this.currentPersonIndex].stories[this.currentStoryIndex];
+    const storyContainer = this.storyContainers.toArray()[this.currentPersonIndex];
+
+    // Clear any previously rendered content
+    storyContainer.nativeElement.innerHTML = '';
+
+    // Load the current story component or content dynamically
+    if (currentStory.component) {
+      const componentRef = this.viewContainerRef.createComponent(currentStory.component);
+      storyContainer.nativeElement.appendChild(componentRef.location.nativeElement);
+    } else if (currentStory.content) {
+      const textNode = document.createTextNode(currentStory.content);
+      storyContainer.nativeElement.appendChild(textNode);
+    } else if (currentStory.imageUrl) {
+      const imgElement = document.createElement('img');
+      imgElement.src = currentStory.imageUrl;
+      imgElement.style.width = '100%';
+      imgElement.style.height = '100%';
+      storyContainer.nativeElement.appendChild(imgElement);
+    } else if (currentStory.videoUrl) {
+      const videoElement = document.createElement('video');
+      videoElement.src = currentStory.videoUrl;
+      videoElement.controls = true;
+      videoElement.style.width = '100%';
+      videoElement.style.height = '100%';
+      storyContainer.nativeElement.appendChild(videoElement);
+    }
   }
 
   startStoryProgress() {
@@ -80,7 +112,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       this.isSwipingLeft = true;
       setTimeout(() => {
         if (this.currentPersonIndex === this.persons.length - 1) {
-          let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+          let stories = this.persons[this.currentPersonIndex]?.stories;
           this.currentStoryIndex = Number(stories?.length) - 1;
           if (this.checkEnd()) return;
         }
@@ -122,6 +154,7 @@ export class NgxStoriesComponent implements AfterViewInit {
 
     this.progressWidth = 0;
     setTimeout(() => {
+      this.loadCurrentStory(); // Load the new current story
       this.startStoryProgress();
       this.isTransitioning = false;
     }, 500); // Match this timeout with the CSS transition duration
@@ -139,11 +172,11 @@ export class NgxStoriesComponent implements AfterViewInit {
 
     this.progressWidth = 0;
     setTimeout(() => {
+      this.loadCurrentStory(); // Load the new current story
       this.startStoryProgress();
       this.isTransitioning = false;
     }, 500); // Match this timeout with the CSS transition duration
   }
-
 
   nextPersonStory() {
     if (this.isTransitioning) return;
@@ -154,6 +187,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     clearInterval(this.intervalId);
     this.progressWidth = 0;
     setTimeout(() => {
+      this.loadCurrentStory(); // Load the new current story
       this.startStoryProgress();
       this.isTransitioning = false;
     }, 500); // Match this timeout with the CSS transition duration
@@ -169,13 +203,14 @@ export class NgxStoriesComponent implements AfterViewInit {
     }
     this.progressWidth = 0;
     setTimeout(() => {
+      this.loadCurrentStory(); // Load the new current story
       this.startStoryProgress();
       this.isTransitioning = false;
     }, 500); // Match this timeout with the CSS transition duration
   }
 
   checkEnd(): boolean {
-    let stories = this.persons.find((person, index) => index === this.currentPersonIndex)?.stories;
+    let stories = this.persons[this.currentPersonIndex]?.stories;
     if (this.currentStoryIndex === Number(stories?.length) - 1 && this.currentPersonIndex === this.persons.length - 1) {
       this.onEnd();
       return true;
@@ -217,12 +252,15 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   togglePause() {
     if (this.isPaused) {
-      this.isPaused = false;
       this.startStoryProgress();
     } else {
-      this.isPaused = true;
       clearInterval(this.intervalId);
     }
+    this.isPaused = !this.isPaused;
+  }
+
+  onSwipeUpTriggered() {
+    this.triggerOnSwipeUp.emit();
   }
 
   onEnd() {
@@ -230,11 +268,6 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   onExit() {
-    // Swipe down event
     this.triggerOnExit.emit();
-  }
-
-  onSwipeUpTriggered() {
-    this.triggerOnSwipeUp.emit();
   }
 }

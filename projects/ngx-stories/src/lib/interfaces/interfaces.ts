@@ -1,8 +1,14 @@
+import { Type, } from "@angular/core";
+
 export type StoryType = 'image' | 'video';
 export interface Story {
     id: number,
     type: StoryType,
-    content: string,
+    title?: string;
+    content?: string;
+    imageUrl?: string;
+    videoUrl?: string;
+    component?: Type<any>;
 }
 
 export interface Person {
