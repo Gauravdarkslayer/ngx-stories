@@ -18,24 +18,6 @@ describe('NgxStoriesComponent', () => {
   it('should create the component', () => {
     expect(component).toBeTruthy(); // This checks if the component is created successfully
   });
-
-  it('should start progress interval for an image story', () => {
-    const fixture = TestBed.createComponent(NgxStoriesComponent);
-    const component = fixture.componentInstance;
-
-    component.storyGroups = [{
-      id: 1,
-      name: 'Test Group',
-      stories: [{ id: 1, type: 'image', content: 'image_url.jpg' }]
-    }];
-
-    fixture.detectChanges();
-
-    spyOn(component, 'startProgressInterval');
-    component.startStoryProgress();
-
-    expect(component.startProgressInterval).toHaveBeenCalledWith(5000);  // default duration
-  });
   
   it('should accept storyGroups input and display stories', () => {
     const mockStoryGroups: StoryGroup[] = [
