@@ -2,14 +2,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
-/* body{
-    background-repeat: repeat;
-    background-size: auto;
-    background-image: url("/assets/images/background.png");
-} */
 
 /* logo CSS */
 .angularlogo {
@@ -222,12 +217,6 @@ body {
         width: 70vw;
         height: 100px;
     }
-
-    /* td { 
-        overflow: hidden; 
-        text-overflow: ellipsis; 
-        word-wrap: break-word;
-    } */
 }
 
 

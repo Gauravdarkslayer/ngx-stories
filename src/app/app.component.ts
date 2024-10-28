@@ -9,6 +9,7 @@ import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projec
   styleUrl: './app.component.css',
 })
 export class AppComponent {
+  installIcon: string = 'assets/images/copy.png';
   storyOptions: NgxStoriesOptions = {
     width: 338,
     height: 600,
@@ -54,5 +55,10 @@ export class AppComponent {
 
   currentStoryDetails(eventData: object) {
     console.log('currentStoryDetails', eventData);
+  }
+
+  copyCommand() {
+    navigator.clipboard.writeText('npm i ngx-stories');
+    this.installIcon = 'assets/images/copy-done.svg';
   }
 }

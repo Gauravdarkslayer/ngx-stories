@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren, HostListener } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
-import { StoryGroup } from '../lib/interfaces/interfaces';
+import { StoryGroup, StoryStateType } from '../lib/interfaces/interfaces';
 import { CommonModule } from '@angular/common';
 import { NgxStoriesService } from './ngx-stories.service';
 import { NgxStoriesOptions } from '../lib/interfaces/interfaces';
@@ -45,7 +45,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   isSwipingRight = false;
   isHolding = false;
   holdTimeout: any; // Timeout for holding the story (pause functionality)
-  storyState: 'playing' | 'paused' | 'holding' | 'buffering' = 'playing';
+  storyState: StoryStateType = 'playing';
   isLoading: boolean = false;
   currentProgressWidth: number = 0;
   // constants
