@@ -1,4 +1,5 @@
 export type StoryType = 'image' | 'video';
+export type StoryStateType = 'playing' | 'paused' | 'holding' | 'buffering' ;
 export interface Story {
     id: number,
     type: StoryType,
