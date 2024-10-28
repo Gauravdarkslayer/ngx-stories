@@ -1,0 +1,237 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* body{
+    background-repeat: repeat;
+    background-size: auto;
+    background-image: url("/assets/images/background.png");
+} */
+
+/* logo CSS */
+.angularlogo {
+    max-width: 100%;
+    height: auto;
+    width: 200px;
+    /* Default size for larger screens */
+}
+
+.copy {
+    width: 20px;
+    /* Default size for larger screens */
+    height: auto;
+}
+
+.doc {
+    width: 20px;
+    /* Default size for larger screens */
+    height: auto;
+}
+
+/* end logo css  */
+
+/* table  */
+
+tbody {
+    background-color: #efedf0;
+    empty-cells: hide;
+    padding: 0;
+    margin: 0;
+}
+
+table {
+    width: 100%;
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    border-collapse: collapse;
+    font-size: 1.3em;
+
+    tbody>tr>td {
+        padding: 10px 25px 10px 25px;
+    }
+}
+
+td {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+thead {
+    width: 50%;
+    height: 50px;
+    background-color: #003E6B;
+    color: white;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+}
+
+.center {
+    text-align: center;
+}
+
+.instructions {
+    width: 2vw;
+    display: inline-block;
+}
+
+/* table end  */
+html,
+body {
+    height: 100%;
+}
+
+.main-container {
+    background-repeat: repeat;
+    background-size: auto;
+    background-image: url("/assets/images/background.png");
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    padding: 20px;
+}
+
+.data-container {
+    width: 50%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.docs {
+    font-weight: 500;
+    font-size: 26px;
+}
+
+.heading {
+    font-size: 2.0em;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.intro-text {
+    font-size: 1.2em;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.install-text {
+    display: flex;
+    align-items: center;
+    background-color: #FFE8E8;
+    padding: 5px 10px;
+    border-style: dashed;
+    border-radius: 8px;
+    border-color: palevioletred;
+    margin-bottom: 20px;
+    font-size: 1.6em;
+    color: darkpink;
+    width: 50%;
+
+    a {
+        margin-top: 0.5rem;
+        margin-right: 1%;
+        margin-left: auto;
+
+    }
+}
+
+.copy {
+    width: 1.4em;
+}
+
+.doc {
+    width: 1em;
+}
+
+.docs {
+    /* margin-bottom: 20px; */
+    margin-top: 10%;
+}
+
+.docs a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.madeby {
+    font-size: 1.6em;
+    color: #555;
+    position: relative;
+    bottom: 0px;
+    text-align: center;
+    margin-top: 10%;
+
+    a {
+        text-decoration: none;
+    }
+}
+
+.heart {
+    color: red;
+}
+
+.story-container {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* background-color: #1b1b1b; */
+    height: 100%;
+}
+
+.angularlogo {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Responsive Design for small screens */
+@media screen and (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+    }
+
+    .data-container,
+    .story-container {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .story-container {
+        height: auto;
+        flex-direction: column;
+    }
+
+    .angularlogo {
+        width: 40%;
+    }
+
+    .install-text {
+        width: 70%;
+    }
+
+    table {
+        width: 70vw;
+        height: 100px;
+    }
+
+    /* td { 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+        word-wrap: break-word;
+    } */
+}
+
+
+
+.remove {
+    color: transparent;
+}

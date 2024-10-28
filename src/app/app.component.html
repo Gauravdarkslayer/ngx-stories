@@ -1,12 +1,45 @@
-<h1>Ngx-Stories Demo</h1>
+<div class="main-container">
+  <div class="data-container">
+    <h1 class="heading">Ngx-Stories</h1>
+    <p class="intro-text">An angular component for rendering Instagram-like stories.</p>
+    <p class="install-text">npm i ngx-stories<a href=""><img class="copy" src="assets/images/copy.png" alt=""></a></p>
 
+    <div class="table">
 
-<ngx-stories
-[storyGroups]="storyGroups"
-[options]="storyOptions"
-backlitColor="#1b1b1b" 
-(triggerOnEnd)="triggerOnEnd()"
-(triggerOnExit)="triggerOnExit()"
-(onStoryGroupChange)="triggerOnStoryGroupChange($event)"
-(triggerOnStoryChange)="currentStoryDetails($event)"
-></ngx-stories>
+      <table>
+        <thead>
+          <tr>
+            <th>Instructions for the Insta Stories</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><img class="instructions" src="assets/images/left.png" alt=""> Tap left for previous stories</td>
+          </tr>
+          <tr>
+            <td><img class="instructions" src="assets/images/right.png" alt=""> Tap right for previous stories</td>
+          </tr>
+          <tr>
+            <td><img class="instructions" src="assets/images/center.png" alt=""> Press and hold to pause</td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+    <!-- <h1 class="remove">.</h1>
+        <h1 class="remove">.</h1> -->
+    <h2 class="docs">Documentation &nbsp; <a href=""><img class="doc" src="assets/images/docs.png" alt=""></a> </h2>
+
+    <p class="madeby">Made with <span class="heart">❤</span> by <a target="_blank"
+        href="https://github.com/gauravdarkslayer">&#64;gaurav</a> </p>
+  </div>
+  <div class="story-container">
+    <img width=50 height=50 class="angularlogo" src="assets/images/angular.png" alt="Angular logo">
+
+    <ngx-stories [storyGroups]="storyGroups" [options]="storyOptions" backlitColor="#1b1b1b"
+      (triggerOnEnd)="triggerOnEnd()" (triggerOnExit)="triggerOnExit()"
+      (onStoryGroupChange)="triggerOnStoryGroupChange($event)"
+      (triggerOnStoryChange)="currentStoryDetails($event)"></ngx-stories>
+  </div>
+
+</div>
