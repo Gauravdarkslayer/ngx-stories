@@ -65,9 +65,6 @@
 
 
 button {
-  // position: absolute;
-  // top: 20%;
-  // transform: translateY(-50%);
   background: none;
   border: none;
   color: white;
@@ -84,13 +81,7 @@ button:hover {
   color: lightgrey;
 }
 
-// button:nth-child(2) {
-//   right: 10px;
-// }
 
-// button:nth-child(1) {
-//   left: 10px;
-// }
 
 .story-container.swipe-left {
   transform: rotateY(-90deg);
@@ -143,9 +134,6 @@ button:hover {
     color: white;
   }
 
-  // button {
-  //   display: none;
-  // }
 }
 
 .story-main-content-container {
@@ -209,9 +197,6 @@ button:hover {
 }
 
 .story-controls {
-  // display: flex;
-  // justify-content: space-between;
-  // align-items: center;
   .pause-play {
     pointer-events: auto;
   }
@@ -235,7 +220,6 @@ button:hover {
 
       .pause-play {
         background-repeat: no-repeat;
-        // background-position: center;
         background-size: contain;
         width: 23px;
         height: 32px;
