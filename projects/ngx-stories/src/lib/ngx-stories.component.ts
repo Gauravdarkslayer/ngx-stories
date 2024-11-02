@@ -49,7 +49,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   isLoading: boolean = false;
   currentProgressWidth: number = 0;
   isAudioEnabled: boolean = false;
-
+  userInteracted: boolean = false;
   // constants
   readonly HOLD_DELAY_MS = 500;
   readonly PROGRESS_INTERVAL_MS = 50;
@@ -98,8 +98,14 @@ export class NgxStoriesComponent implements AfterViewInit {
     if (currentStory.type === 'video') {
       const videoElement: HTMLVideoElement = document.createElement('video');
       videoElement.src = currentStory.content;
+      // videoElement.oncanplaythrough=(() => {
+      //   console.log("canplay");
+        
+      //   this.isAudioEnabled = true;
+      // });
       // Use the video duration or a default if not available
       videoElement.onloadedmetadata = () => {
+        console.log("loaded metadata");
         this.onContentLoaded(); // Call when metadata is loaded
         storyDuration = videoElement.duration * 1000; // Convert to milliseconds
         this.startProgressInterval(storyDuration);
@@ -367,6 +373,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   private storyGroupChange(storyGroupIndex: number = this.currentStoryGroupIndex) {
     this.onStoryGroupChange.emit(storyGroupIndex);
   }
+
   private populateCurrentDetails(currentSIndex: number, currentSGIndex: number) {
     try {
       const dataToSend = {
@@ -402,6 +409,15 @@ export class NgxStoriesComponent implements AfterViewInit {
   toggleAudio() {
     this.isAudioEnabled = !this.isAudioEnabled;
     this.storyContainers.first.nativeElement.querySelector('video').muted = !this.isAudioEnabled;
+  }
+
+  // Detect user interaction on the document level
+  @HostListener('document:click', ['$event'])
+  onUserInteraction() {
+    if (!this.userInteracted) {
+      this.userInteracted = true;
+      this.isAudioEnabled = true;
+    }
   }
 
 }
