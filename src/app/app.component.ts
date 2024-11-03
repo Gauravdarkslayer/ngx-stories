@@ -22,9 +22,9 @@ export class AppComponent {
       name: 'Steve Smith',
       stories: [
         { id: 1, type: 'image', content: 'https://i.ibb.co/ZMVy3KN/pexels-rpnickson-2486168.jpg' },
-        { id: 2, type: 'video', content: 'https://videos.pexels.com/video-files/19063801/19063801-uhd_2560_1440_60fps.mp4' },
+        { id: 2, type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
         { id: 3, type: 'video', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-        { id: 4, type: 'video', content: 'https://videos.pexels.com/video-files/13953067/13953067-hd_1080_1920_30fps.mp4' },
+        { id: 4, type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
         { id: 5, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
       ]
     },
@@ -60,5 +60,8 @@ export class AppComponent {
   copyCommand() {
     navigator.clipboard.writeText('npm i ngx-stories');
     this.installIcon = 'assets/images/copy-done.svg';
+    setTimeout(() => {
+      this.installIcon = 'assets/images/copy.png';
+    }, 3000);
   }
 }

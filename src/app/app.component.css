@@ -15,7 +15,6 @@
 }
 
 .copy {
-    width: 20px;
     /* Default size for larger screens */
     height: auto;
 }
@@ -139,9 +138,6 @@ body {
     }
 }
 
-.copy {
-    width: 1.4em;
-}
 
 .doc {
     width: 1em;

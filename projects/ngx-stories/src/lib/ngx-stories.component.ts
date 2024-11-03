@@ -48,6 +48,8 @@ export class NgxStoriesComponent implements AfterViewInit {
   storyState: StoryStateType = 'playing';
   isLoading: boolean = false;
   currentProgressWidth: number = 0;
+  isAudioEnabled: boolean = false;
+  userInteracted: boolean = false;
   // constants
   readonly HOLD_DELAY_MS = 500;
   readonly PROGRESS_INTERVAL_MS = 50;
@@ -94,11 +96,16 @@ export class NgxStoriesComponent implements AfterViewInit {
     const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
     let storyDuration = 5000; // Default duration (in milliseconds) for images
     if (currentStory.type === 'video') {
-      const videoElement = document.createElement('video');
+      const videoElement: HTMLVideoElement = document.createElement('video');
       videoElement.src = currentStory.content;
-      videoElement.muted = true;
+      // videoElement.oncanplaythrough=(() => {
+      //   console.log("canplay");
+        
+      //   this.isAudioEnabled = true;
+      // });
       // Use the video duration or a default if not available
       videoElement.onloadedmetadata = () => {
+        console.log("loaded metadata");
         this.onContentLoaded(); // Call when metadata is loaded
         storyDuration = videoElement.duration * 1000; // Convert to milliseconds
         this.startProgressInterval(storyDuration);
@@ -199,9 +206,9 @@ export class NgxStoriesComponent implements AfterViewInit {
       direction === 'next'
         ? this.storyService.nextStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, this.storyGroupChange.bind(this))
         : this.storyService.prevStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, this.storyGroupChange.bind(this));
-        
-        this.currentStoryGroupIndex = storyGroupIndex;
-        this.currentStoryIndex = storyIndex;
+
+    this.currentStoryGroupIndex = storyGroupIndex;
+    this.currentStoryIndex = storyIndex;
 
     //Trigger onEnd emitter when all the storieGroups are traversed.
     if (this.currentStoryGroupIndex === this.storyGroups.length) {
@@ -230,6 +237,7 @@ export class NgxStoriesComponent implements AfterViewInit {
         const videoElement: HTMLVideoElement | null = activeStoryContent.querySelector('video');
 
         if (videoElement) {
+          videoElement.muted = !this.isAudioEnabled;
           videoElement.play().catch(err => {
             console.error(err);
           })
@@ -365,18 +373,19 @@ export class NgxStoriesComponent implements AfterViewInit {
   private storyGroupChange(storyGroupIndex: number = this.currentStoryGroupIndex) {
     this.onStoryGroupChange.emit(storyGroupIndex);
   }
+
   private populateCurrentDetails(currentSIndex: number, currentSGIndex: number) {
     try {
-      const dataToSend =  {
+      const dataToSend = {
         currentPerson: this.storyGroups[currentSGIndex].name,
         currentPersonIndex: currentSGIndex,
         currentStory: this.storyGroups[currentSGIndex].stories[currentSIndex],
         currentStoryIndex: currentSIndex,
-        previousStory: currentSIndex !== 0 ? this.storyGroups[currentSGIndex].stories[currentSIndex -1] : null,
+        previousStory: currentSIndex !== 0 ? this.storyGroups[currentSGIndex].stories[currentSIndex - 1] : null,
         previousStoryIndex: currentSIndex !== 0 ? currentSIndex : null
       }
       this.triggerOnStoryChange.emit(dataToSend);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
     }
   }
@@ -396,4 +405,19 @@ export class NgxStoriesComponent implements AfterViewInit {
     console.error('Error loading content');
     this.isLoading = false;
   }
+
+  toggleAudio() {
+    this.isAudioEnabled = !this.isAudioEnabled;
+    this.storyContainers.first.nativeElement.querySelector('video').muted = !this.isAudioEnabled;
+  }
+
+  // Detect user interaction on the document level
+  @HostListener('document:click', ['$event'])
+  onUserInteraction() {
+    if (!this.userInteracted) {
+      this.userInteracted = true;
+      this.isAudioEnabled = true;
+    }
+  }
+
 }
