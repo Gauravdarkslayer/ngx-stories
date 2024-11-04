@@ -79,7 +79,8 @@ interface NgxStoriesOptions {
 * Swipe Gestures (Mobile Friendly): Allow users to swipe left or right to navigate through the stories.
 * Hold to Pause: Pause the story progress when the user holds their finger on the screen.
 * Events: Trigger events when the user reaches the end of the stories or when they exit the carousel.
-* Keyboard navigation
+* Keyboard navigation(Experimental).
+* Loading: A Loading svg will be shown when story buffers (SVG from <a href="https://www.svgbackgrounds.com/elements/animated-svg-preloaders/">Animated SVG Preloaders by SVGBackgrounds.com</a>)
 
 ## Contributing
 [Contributing Guide](https://github.com/Gauravdarkslayer/ngx-stories/blob/main/CONTRIBUTING.md)
