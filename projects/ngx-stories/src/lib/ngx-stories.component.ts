@@ -7,6 +7,7 @@ import { NgxStoriesService } from './ngx-stories.service';
 import { NgxStoriesOptions } from '../lib/interfaces/interfaces';
 import { onStoryGroupChange, triggerOnEnd, triggerOnExit, triggerOnStoryChange, triggerOnSwipeUp } from './utils/story-event-emitters';
 import "hammerjs";
+import { options as ngxStoriesOptions } from './utils/default-options';
 
 @Component({
   selector: 'ngx-stories',
@@ -20,15 +21,10 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   // Input property to accept the list of storyGroup and their stories
   @Input({ required: true }) storyGroups: StoryGroup[] = [];
-  @Input() backlitColor: string = '#1b1b1b';
 
   // options
-  @Input() options: NgxStoriesOptions = {
-    width: 360,
-    height: 768,
-    currentStoryIndex: 0,
-    currentStoryGroupIndex: 0
-  };
+  @Input() options: NgxStoriesOptions = {};
+
   // Output events to handle end of stories, exit, and swipe-up gesture
   @Output() triggerOnEnd = triggerOnEnd;
   @Output() triggerOnExit = triggerOnExit;
@@ -60,7 +56,10 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   constructor(
     private storyService: NgxStoriesService
-  ) { }
+  ) { 
+
+   
+  }
 
 
   //Use Keyboard Navigations to control the stories
@@ -79,7 +78,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.setInitialStoryIndex();
+    this.setStoryOptions();
     this.startStoryProgress();
   }
 
@@ -98,14 +97,9 @@ export class NgxStoriesComponent implements AfterViewInit {
     if (currentStory.type === 'video') {
       const videoElement: HTMLVideoElement = document.createElement('video');
       videoElement.src = currentStory.content;
-      // videoElement.oncanplaythrough=(() => {
-      //   console.log("canplay");
-        
-      //   this.isAudioEnabled = true;
-      // });
+
       // Use the video duration or a default if not available
       videoElement.onloadedmetadata = () => {
-        console.log("loaded metadata");
         this.onContentLoaded(); // Call when metadata is loaded
         storyDuration = videoElement.duration * 1000; // Convert to milliseconds
         this.startProgressInterval(storyDuration);
@@ -130,10 +124,15 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.populateCurrentDetails(this.currentStoryIndex, this.currentStoryGroupIndex)
   }
 
-  private setInitialStoryIndex() {
-    //Set the index for the story view to start with.
-    this.currentStoryIndex = this.options.currentStoryIndex;
-    this.currentStoryGroupIndex = this.options.currentStoryGroupIndex;
+  private setStoryOptions() {
+    this.options = {
+      ...ngxStoriesOptions,
+      ...this.options
+    };
+
+    // Set the index for the story view to start with.
+    this.currentStoryIndex = this.options.currentStoryIndex as number;
+    this.currentStoryGroupIndex = this.options.currentStoryGroupIndex as number;
   }
 
   startProgressInterval(storyDuration: number) {
