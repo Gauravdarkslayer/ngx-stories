@@ -11,10 +11,12 @@ import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projec
 export class AppComponent {
   installIcon: string = 'assets/images/copy.png';
   storyOptions: NgxStoriesOptions = {
-    width: 338,
-    height: 600,
-    currentStoryIndex: 0,
-    currentStoryGroupIndex: 0
+    // Tweak these options as needed
+    // width: 338,
+    // height: 600,
+    // currentStoryIndex: 0,
+    // currentStoryGroupIndex: 0,
+    backlitColor: '#1b1b1b'
   };
   readonly storyGroups: StoryGroup[] = [
     {

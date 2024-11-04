@@ -42,16 +42,14 @@
         </svg>
       </div>
         <div class="story-main-content-container">
-          @if(story.type === 'image') {
-          <div [ngStyle]="{ 'background-color': backlitColor }" class="story-style">
+          <div [ngStyle]="{ 'background-color': options.backlitColor }" class="story-style">
+            @if(story.type === 'image') {
             <img [src]="story.content" alt="user story" (load)="onContentLoaded()" (error)="onContentError()">
+            } @else if(story.type === 'video') {
+              <video [src]="story.content"  (loadeddata)="onContentLoaded()"
+                (waiting)="onContentBuffering()" (playing)="onContentLoaded()" ></video>
+            }
           </div>
-          } @else if(story.type === 'video') {
-          <div [ngStyle]="{ 'background-color': backlitColor }" class="story-style">
-            <video [src]="story.content"  (loadeddata)="onContentLoaded()"
-              (waiting)="onContentBuffering()" (playing)="onContentLoaded()" ></video>
-          </div>
-          }
         </div>
       </div>
       }

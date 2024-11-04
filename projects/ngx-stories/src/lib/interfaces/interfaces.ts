@@ -13,8 +13,9 @@ export interface StoryGroup {
 }
 
 export interface NgxStoriesOptions {
-    width: number,
-    height: number,
-    currentStoryIndex: number,
-    currentStoryGroupIndex: number
+    width?: number,
+    height?: number,
+    currentStoryIndex?: number,
+    currentStoryGroupIndex?: number,
+    backlitColor?: string
 }
