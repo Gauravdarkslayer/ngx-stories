@@ -33,6 +33,7 @@ export class AppComponent {
         name: 'John Doe',
         stories: [
           { id: 101, type: 'image', content: 'https://example.com/story1.jpg' },
+          { id: 101, type: 'component', content: CustomComponent }, // pass any angular component to render in stories
         ],
       },
       {
@@ -82,6 +83,7 @@ interface NgxStoriesOptions {
 * Keyboard navigation(Experimental).
 * Loading: A Loading svg will be shown when story buffers (SVG from <a href="https://www.svgbackgrounds.com/elements/animated-svg-preloaders/">Animated SVG Preloaders by SVGBackgrounds.com</a>)
 * Audio controls: Toggle audio on/off for stories that have audio.
+* Component based stories for best control.
 
 ## Contributing
 [Contributing Guide](https://github.com/Gauravdarkslayer/ngx-stories/blob/main/CONTRIBUTING.md)
