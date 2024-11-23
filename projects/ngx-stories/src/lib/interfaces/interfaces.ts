@@ -1,9 +1,11 @@
-export type StoryType = 'image' | 'video';
+import { Component, Type } from "@angular/core";
+
+export type StoryType = 'image' | 'video' | 'component';
 export type StoryStateType = 'playing' | 'paused' | 'holding' | 'buffering' ;
 export interface Story {
     id: number,
     type: StoryType,
-    content: string,
+    content: string | Type<Component>,
 }
 
 export interface StoryGroup {

@@ -1,4 +1,4 @@
-import { ElementRef, Injectable, QueryList } from "@angular/core";
+import { ElementRef, Injectable, QueryList, Type, ViewContainerRef } from "@angular/core";
 import { NgxStoriesOptions, StoryGroup } from "./interfaces/interfaces";
 @Injectable({
   providedIn: 'root',
@@ -73,5 +73,20 @@ export class NgxStoriesService {
     img.src = src;
     return img.complete;
   }
-  
+
+  /**
+  * Dynamically creates and injects a component into the specified ViewContainerRef.
+  * @param containerRef The ViewContainerRef where the component should be injected.
+  * @param component The component class (Type) to be dynamically created.
+  */
+  renderComponent<T>(
+    containerRef: ViewContainerRef,
+    component: Type<T>,
+  ): T {
+    // Clear previous components in the container (if any)
+    containerRef?.clear();
+
+    const componentRef = containerRef.createComponent(component);
+    return componentRef.instance;
+  }
 }

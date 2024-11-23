@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren, HostListener } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren, HostListener, ViewChild, ViewContainerRef, Type } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
 import { StoryGroup, StoryStateType } from '../lib/interfaces/interfaces';
@@ -53,12 +53,14 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   // Queries the story containers in the view for gesture handling
   @ViewChildren('storyContainer') storyContainers!: QueryList<ElementRef>;
+  // Add a ViewContainerRef to inject dynamic components
+  @ViewChild('dynamicComponentContainer', { read: ViewContainerRef, static: false }) dynamicComponentContainer!: ViewContainerRef;
 
   constructor(
-    private storyService: NgxStoriesService
-  ) { 
+    private storyService: NgxStoriesService,
+  ) {
 
-   
+
   }
 
 
@@ -96,7 +98,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     let storyDuration = 5000; // Default duration (in milliseconds) for images
     if (currentStory.type === 'video') {
       const videoElement: HTMLVideoElement = document.createElement('video');
-      videoElement.src = currentStory.content;
+      videoElement.src = currentStory.content as string;
 
       // Use the video duration or a default if not available
       videoElement.onloadedmetadata = () => {
@@ -104,13 +106,20 @@ export class NgxStoriesComponent implements AfterViewInit {
         storyDuration = videoElement.duration * 1000; // Convert to milliseconds
         this.startProgressInterval(storyDuration);
       };
+    } else if (currentStory.type === 'component') {
+      setTimeout(() => {
+        // Small delay to detect changes in DOM
+        this.storyService.renderComponent(this.dynamicComponentContainer, currentStory.content as Type<any>);
+        this.onContentLoaded();
+        this.startProgressInterval(5000); // Default duration for components
+      }, 100);
     } else {
       // Handling for images
       const imageElement = document.createElement('img');
-      imageElement.src = currentStory.content;
+      imageElement.src = currentStory.content as string;
 
       // Check if the image is cached
-      if (this.storyService.isImageCached(currentStory.content)) {
+      if (this.storyService.isImageCached(currentStory.content as string)) {
         this.onContentLoaded(); // Call immediately if cached
         this.startProgressInterval(storyDuration); // Use default image duration
       } else {

@@ -48,6 +48,8 @@
             } @else if(story.type === 'video') {
               <video [src]="story.content"  (loadeddata)="onContentLoaded()"
                 (waiting)="onContentBuffering()" (playing)="onContentLoaded()" ></video>
+            } @else if(story.type === 'component') {
+              <ng-container #dynamicComponentContainer></ng-container>
             }
           </div>
         </div>

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Type } from '@angular/core';
 import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projects/ngx-stories/src/public-api';
+import { CustomComponentComponent } from './components/custom-component/custom-component.component';
 
 @Component({
   selector: 'app-root',
@@ -24,10 +25,11 @@ export class AppComponent {
       name: 'Steve Smith',
       stories: [
         { id: 1, type: 'image', content: 'https://i.ibb.co/ZMVy3KN/pexels-rpnickson-2486168.jpg' },
-        { id: 2, type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
-        { id: 3, type: 'video', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-        { id: 4, type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
-        { id: 5, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
+        { id: 2, type: 'component', content: CustomComponentComponent },
+        { id: 3, type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
+        { id: 4, type: 'video', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+        { id: 5, type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
+        { id: 6, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
       ]
     },
     {
