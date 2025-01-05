@@ -50,20 +50,20 @@ describe('NgxStoriesService', () => {
   describe('nextStory', () => {
     const storyGroups: StoryGroup[] = [
       {
-        id: 1,
+        id: '1',
         name: 'John Doe',
         stories: [
-          { id: 1, type: 'image', content: 'assets/story1.jpg' },
-          { id: 2, type: 'video', content: 'assets/story2.mp4' },
-          { id: 3, type: 'image', content: 'assets/story3.jpg' }
+          { id: '1', type: 'image', content: 'assets/story1.jpg' },
+          { id: '2', type: 'video', content: 'assets/story2.mp4' },
+          { id: '3', type: 'image', content: 'assets/story3.jpg' }
         ]
       },
       {
-        id: 2,
+        id: '2',
         name: 'Jane Smith',
         stories: [
-          { id: 1, type: 'image', content: 'assets/story4.jpg' },
-          { id: 2, type: 'video', content: 'assets/story5.mp4' }
+          { id: '1', type: 'image', content: 'assets/story4.jpg' },
+          { id: '2', type: 'video', content: 'assets/story5.mp4' }
         ]
       }
     ];
@@ -86,20 +86,20 @@ describe('NgxStoriesService', () => {
   describe('prevStory', () => {
     const storyGroups: StoryGroup[] = [
       {
-        id: 1,
+        id: '1',
         name: 'John Doe',
         stories: [
-          { id: 1, type: 'image', content: 'assets/story1.jpg' },
-          { id: 2, type: 'video', content: 'assets/story2.mp4' },
-          { id: 3, type: 'image', content: 'assets/story3.jpg' }
+          { id: '1', type: 'image', content: 'assets/story1.jpg' },
+          { id: '2', type: 'video', content: 'assets/story2.mp4' },
+          { id: '3', type: 'image', content: 'assets/story3.jpg' }
         ]
       },
       {
-        id: 2,
+        id: '2',
         name: 'Jane Smith',
         stories: [
-          { id: 1, type: 'image', content: 'assets/story4.jpg' },
-          { id: 2, type: 'video', content: 'assets/story5.mp4' }
+          { id: '1', type: 'image', content: 'assets/story4.jpg' },
+          { id: '2', type: 'video', content: 'assets/story5.mp4' }
         ]
       }
     ];
