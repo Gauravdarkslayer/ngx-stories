@@ -5,6 +5,9 @@ An Angular component to render instagram like stories.
 [![npm downloads](https://img.shields.io/npm/dt/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
 [![npm version](https://img.shields.io/npm/v/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
 
+## Screenshot
+![Story Screenshot](./assets/images/story-screenshot.png)
+
 
 ## For Version 17+
 
