@@ -5,6 +5,9 @@ An Angular component to render instagram like stories.
 [![npm downloads](https://img.shields.io/npm/dt/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
 [![npm version](https://img.shields.io/npm/v/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
 
+## Screenshot
+![Story Screenshot](./assets/images/story-screenshot.png)
+
 
 ## For Version 17+
 
@@ -29,19 +32,17 @@ import { NgxStoriesComponent, StoryGroup } from 'ngx-stories';
 export class AppComponent {
   storyGroups: StoryGroup[] = [
       {
-        id: 1,
         name: 'John Doe',
         stories: [
-          { id: 101, type: 'image', content: 'https://example.com/story1.jpg' },
-          { id: 101, type: 'component', content: CustomComponent }, // pass any angular component to render in stories
+          { type: 'image', content: 'https://example.com/story1.jpg' },
+          { type: 'component', content: CustomComponent }, // pass any angular component to render in stories
         ],
       },
       {
-        id: 2,
         name: 'Jane Smith',
         stories: [
-          { id: 103, type: 'image', content: 'https://example.com/story3.jpg' },
-          { id: 3, type: 'video', content: 'https://example.com/video-story.mp4' },
+          { type: 'image', content: 'https://example.com/story3.jpg' },
+          { type: 'video', content: 'https://example.com/video-story.mp4' },
         ],
       },
     ];
@@ -61,6 +62,7 @@ export class AppComponent {
 | `triggerOnExit`    | `EventEmitter<void>`  | No       | Output event that is triggered when the user manually exits the story view.                                   |
 | `triggerOnSwipeUp` | `EventEmitter<void>`  | No       | Output event that is triggered when the user performs a swipe-up gesture, typically for additional actions.    |
 | `onStoryGroupChange` | `EventEmitter<number>`  | No       | Output event that is triggered when the user changes the storyGroup.
+| `triggerOnStoryChange` | `EventEmitter<object>`  | No       | Output event that is triggered when the user changes the story.
 
 
 ```ts
@@ -84,6 +86,7 @@ interface NgxStoriesOptions {
 * Loading: A Loading svg will be shown when story buffers (SVG from <a href="https://www.svgbackgrounds.com/elements/animated-svg-preloaders/">Animated SVG Preloaders by SVGBackgrounds.com</a>)
 * Audio controls: Toggle audio on/off for stories that have audio.
 * Component based stories for best control.
+* Auto-assigning unique ids to storyGroups and stories.
 
 ## Contributing
 [Contributing Guide](https://github.com/Gauravdarkslayer/ngx-stories/blob/main/CONTRIBUTING.md)
