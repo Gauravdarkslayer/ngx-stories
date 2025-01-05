@@ -22,11 +22,11 @@ describe('NgxStoriesComponent', () => {
   it('should accept storyGroups input and display stories', () => {
     const mockStoryGroups: StoryGroup[] = [
       {
-        id: 1,
+        id: '1',
         name: 'Gaurav',
         stories: [
-          { id: 1, type: 'image', content: 'https://example.com/story1.jpg' },
-          { id: 2, type: 'image', content: 'https://example.com/story2.jpg' },
+          { id: '1', type: 'image', content: 'https://example.com/story1.jpg' },
+          { id: '2', type: 'image', content: 'https://example.com/story2.jpg' },
         ],
       },
     ];

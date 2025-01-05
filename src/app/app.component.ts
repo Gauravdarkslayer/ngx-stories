@@ -21,26 +21,24 @@ export class AppComponent {
   };
   readonly storyGroups: StoryGroup[] = [
     {
-      id: 1,
       name: 'Steve Smith',
       stories: [
-        { id: 1, type: 'image', content: 'https://i.ibb.co/ZMVy3KN/pexels-rpnickson-2486168.jpg' },
-        { id: 2, type: 'component', content: CustomComponentComponent },
-        { id: 3, type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
-        { id: 4, type: 'video', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-        { id: 5, type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
-        { id: 6, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
+        { type: 'image', content: 'https://i.ibb.co/ZMVy3KN/pexels-rpnickson-2486168.jpg' },
+        { type: 'component', content: CustomComponentComponent },
+        { type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
+        { type: 'video', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+        { type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
+        { type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
       ]
     },
     {
-      id: 2,
       name: 'John Doe',
       stories: [
-        { id: 1, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/4.jpg' },
-        { id: 2, type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/5.jpg' },
-        { id: 3, type: 'video', content: 'https://videos.pexels.com/video-files/28759029/12469290_1920_1080_25fps.mp4' },
-        { id: 4, type: 'video', content: 'https://videos.pexels.com/video-files/28985119/12537126_1920_1080_24fps.mp4' },
-        { id: 5, type: 'video', content: 'https://videos.pexels.com/video-files/28496760/12399731_1440_2560_30fps.mp4' }
+        { type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/4.jpg' },
+        { type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/5.jpg' },
+        { type: 'video', content: 'https://videos.pexels.com/video-files/28759029/12469290_1920_1080_25fps.mp4' },
+        { type: 'video', content: 'https://videos.pexels.com/video-files/28985119/12537126_1920_1080_24fps.mp4' },
+        { type: 'video', content: 'https://videos.pexels.com/video-files/28496760/12399731_1440_2560_30fps.mp4' }
       ]
     },
   ];
@@ -54,7 +52,7 @@ export class AppComponent {
   }
 
   triggerOnStoryGroupChange(storyGroup: number) {
-    console.log('currentStoryGroupDetails',storyGroup);
+    console.log('currentStoryGroupDetails', storyGroup);
   }
 
   currentStoryDetails(eventData: object) {
