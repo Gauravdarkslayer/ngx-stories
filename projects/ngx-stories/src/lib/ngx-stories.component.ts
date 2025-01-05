@@ -82,6 +82,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   ngOnInit(): void {
     this.setStoryOptions();
     this.startStoryProgress();
+    this.storyGroups = this.storyService.assignIdsIfMissing(this.storyGroups);
   }
 
   ngOnDestroy(): void {

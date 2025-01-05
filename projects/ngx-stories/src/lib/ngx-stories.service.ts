@@ -1,5 +1,6 @@
 import { ElementRef, Injectable, QueryList, Type, ViewContainerRef } from "@angular/core";
 import { NgxStoriesOptions, StoryGroup } from "./interfaces/interfaces";
+import { generateUniqueId } from "./utils/id-generator";
 @Injectable({
   providedIn: 'root',
 })
@@ -88,5 +89,18 @@ export class NgxStoriesService {
 
     const componentRef = containerRef.createComponent(component);
     return componentRef.instance;
+  }
+
+  /**
+   * Assigns unique ids to storyGroups and stories if they are missing.
+  */
+  assignIdsIfMissing(storyGroups: StoryGroup[]): StoryGroup[] {
+    for (const storyGroup of storyGroups) {
+      storyGroup.id = storyGroup.id || generateUniqueId();
+      for (const story of storyGroup.stories) {
+        story.id = story.id || generateUniqueId();
+      }
+    }
+    return storyGroups;
   }
 }
