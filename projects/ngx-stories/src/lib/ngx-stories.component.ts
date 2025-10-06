@@ -268,6 +268,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   private goToNextStoryGroup() {
+    this.pauseCurrentVideo(true); 
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     this.currentStoryGroupIndex = (this.currentStoryGroupIndex + 1) % this.storyGroups.length;
@@ -283,6 +284,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   private goToPreviousStoryGroup() {
+    this.pauseCurrentVideo(true); // <-- Add this line
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     this.currentStoryIndex = 0;
