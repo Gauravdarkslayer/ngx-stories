@@ -257,20 +257,18 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   private pauseCurrentVideo(seek: null | boolean = null) {
-    let currentStory = this.storyGroups.find((storyGroup, index) => index === this.currentStoryGroupIndex)?.stories[this.currentStoryIndex];
-    if (currentStory?.type === 'video') {
-      const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex]; // Current story group container
-      const activeStoryContent = activeStoryContainer.nativeElement.querySelector('.story-content.active'); // Active story within the group
-      const videoElement: HTMLVideoElement | null = activeStoryContent.querySelector('video');
-
-      if (videoElement) {
-        videoElement.pause();
-        seek && (videoElement.currentTime = 0);
-      }
-    }
+    // Pause all videos in all story containers
+    this.storyContainers?.forEach(container => {
+      const videos = container.nativeElement.querySelectorAll('video');
+      videos.forEach((video: HTMLVideoElement) => {
+        video.pause();
+        if (seek) video.currentTime = 0;
+      });
+    });
   }
 
   private goToNextStoryGroup() {
+    this.pauseCurrentVideo(true); 
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     this.currentStoryGroupIndex = (this.currentStoryGroupIndex + 1) % this.storyGroups.length;
@@ -286,6 +284,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   private goToPreviousStoryGroup() {
+    this.pauseCurrentVideo(true); // <-- Add this line
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     this.currentStoryIndex = 0;
