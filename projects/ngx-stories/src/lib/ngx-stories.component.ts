@@ -30,7 +30,7 @@ import { options as ngxStoriesOptions } from './utils/default-options';
 @Component({
   selector: 'ngx-stories',
   standalone: true,
-  imports: [RouterOutlet, HammerModule, CommonModule],
+  imports: [HammerModule, CommonModule],
   templateUrl: './ngx-stories.component.html',
   styleUrl: './ngx-stories.component.scss',
 })
