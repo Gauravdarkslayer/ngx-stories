@@ -1,5 +1,9 @@
-import { Component, Type } from '@angular/core';
-import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projects/ngx-stories/src/public-api';
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import {
+  NgxStoriesComponent,
+  NgxStoriesOptions,
+  StoryGroup
+} from '../../projects/ngx-stories/src/public-api';
 import { CustomComponentComponent } from './components/custom-component/custom-component.component';
 
 @Component({
@@ -9,16 +13,16 @@ import { CustomComponentComponent } from './components/custom-component/custom-c
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   installIcon: string = 'assets/images/copy.png';
+
+  // Access to the NgxStories component
+  @ViewChild(NgxStoriesComponent) ngxStoriesComponent!: NgxStoriesComponent;
+
   storyOptions: NgxStoriesOptions = {
-    // Tweak these options as needed
-    // width: 338,
-    // height: 600,
-    // currentStoryIndex: 0,
-    // currentStoryGroupIndex: 0,
     backlitColor: '#1b1b1b'
   };
+
   readonly storyGroups: StoryGroup[] = [
     {
       name: 'Steve Smith',
@@ -42,6 +46,17 @@ export class AppComponent {
       ]
     },
   ];
+
+  ngAfterViewInit() {
+    // Handle tab visibility changes
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.ngxStoriesComponent?.pauseStory();
+      } else {
+        this.ngxStoriesComponent?.resumeStory();
+      }
+    });
+  }
 
   triggerOnEnd() {
     console.log('End');
