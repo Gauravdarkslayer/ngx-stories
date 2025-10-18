@@ -21,7 +21,7 @@ An Angular component to render instagram like stories.
 
 ---
 ## Screenshot
-![Story Screenshot](./assets/images/story-screenshot.png)
+![Story Screenshot](./assets/images/ngxstoriess.mp4)
 
 
 ## For Version 17+
