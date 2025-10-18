@@ -20,7 +20,7 @@ An Angular component to render instagram like stories.
 - [License](#license)
 
 ---
-## Screenshot
+## Demo
 ![Story Screenshot](./assets/images/ngxstories.gif)
 
 
