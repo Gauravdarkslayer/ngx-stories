@@ -1,43 +1,87 @@
-<div class="main-container">
-  <div class="data-container">
-    <h1 class="heading">Ngx-Stories</h1>
-    <p class="intro-text">An angular component for rendering instagram like stories.</p>
-    <p class="install-text">npm i ngx-stories<a href="javascript:void(0)" (click)="copyCommand()">
-      <img class="copy" [src]="installIcon" alt="copy icon" width="30" height="30"></a>
+<div class="page-container">
+
+
+  <div class="left-section">
+
+
+    <h1 class="main-title">Ngx-Stories</h1>
+
+
+    <p class="description-text">
+      An Angular component for rendering Instagram-like stories with simple,
+      touch-friendly interactions.
     </p>
 
-    <div class="table">
-      <table>
-        <thead>
-          <tr>
-            <th>Instructions for the Ngx-Stories</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><img class="instructions" src="assets/images/left.png" alt=""> Tap left for previous stories</td>
-          </tr>
-          <tr>
-            <td><img class="instructions" src="assets/images/right.png" alt=""> Tap right for next stories</td>
-          </tr>
-          <tr>
-            <td><img class="instructions" src="assets/images/center.png" alt=""> Press and hold to pause</td>
-          </tr>
-        </tbody>
-      </table>
+
+    <div class="install-container">
+      <code class="install-code">npm i ngx-stories</code>
+      <button class="copy-button" (click)="copyCommand()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        <span>Copy</span>
+      </button>
     </div>
-    <h2 class="docs">Documentation &nbsp; <a href=""><img class="doc" src="assets/images/docs.png" alt=""></a> </h2>
 
-    <p class="madeby">Made with <span class="heart">❤</span> by <a target="_blank"
-        href="https://github.com/gauravdarkslayer">&#64;gaurav</a> </p>
+
+    <div class="instructions-container">
+      <div class="instructions-header">
+        Instructions for the Ngx-Stories
+      </div>
+      <div class="instructions-list">
+        <div class="instruction-row">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span>Tap left for previous stories</span>
+        </div>
+        <div class="instruction-row">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
+          <span>Tap right for next stories</span>
+        </div>
+        <div class="instruction-row">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>Press and hold to pause</span>
+        </div>
+      </div>
+    </div>
+
+
+    <a href="#" class="docs-link">
+      <span>Documentation</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <line x1="10" y1="14" x2="21" y2="3"></line>
+      </svg>
+    </a>
+
+
+    <p class="footer-credits">
+      Made with <span class="heart-icon">♥</span> by <a href="https://github.com/gauravdarkslayer"
+        target="_blank">gaurav</a>
+    </p>
+
   </div>
-  <div class="story-container">
-    <img width=50 height=50 class="angularlogo" src="assets/images/angular.png" alt="Angular logo">
 
+  <div class="right-section">
+    <div class="angular-badge">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+      <span>Angular</span>
+    </div>
     <ngx-stories [storyGroups]="storyGroups" [options]="storyOptions" backlitColor="#1b1b1b"
       (triggerOnEnd)="triggerOnEnd()" (triggerOnExit)="triggerOnExit()"
-      (onStoryGroupChange)="triggerOnStoryGroupChange($event)"
-      (triggerOnStoryChange)="currentStoryDetails($event)"></ngx-stories>
+      (onStoryGroupChange)="triggerOnStoryGroupChange($event)" (triggerOnStoryChange)="currentStoryDetails($event)">
+    </ngx-stories>
   </div>
 
 </div>
