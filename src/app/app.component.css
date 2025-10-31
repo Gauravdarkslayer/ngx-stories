@@ -8,10 +8,12 @@
 html,
 body {
   height: 100%;
+  width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 /* Main Container */
@@ -23,6 +25,8 @@ body {
   padding: 2rem;
   gap: 4rem;
   align-items: center;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 
@@ -34,23 +38,52 @@ body {
   gap: 1.5rem;
   position: relative;
   padding: 1rem 0;
+  width: 100%;
 }
 
 /* Angular Badge */
 .angular-badge {
-  position: absolute;
-  top: 50px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  background-color: #ffffff;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   color: #1f2937;
   font-size: 0.9rem;
-  font-weight: 800;
+  font-weight: 700;
+  width: fit-content;
+  margin: 0 auto 1rem auto;
+  transition: all 0.3s ease;
 }
 
-.angular-badge svg {
+.angular-badge:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.angular-badge .angular-icon {
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
+}
+
+.angular-badge span {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* Stories Wrapper */
+.stories-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Main Title */
@@ -89,6 +122,8 @@ body {
   color: #000000;
   background: none;
   border: none;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .copy-button {
@@ -103,7 +138,9 @@ body {
   font-weight: 500;
   color: #374151;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .copy-button:hover {
@@ -113,6 +150,76 @@ body {
 
 .copy-button:active {
   transform: scale(0.97);
+}
+
+/* Copied state styles */
+.copy-button.copied {
+  background-color: #d1fae5;
+  border-color: #10b981;
+  color: #065f46;
+}
+
+.copy-button.copied:hover {
+  background-color: #a7f3d0;
+  border-color: #059669;
+}
+
+.copy-icon,
+.check-icon {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: inline-block;
+}
+
+.copy-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.check-icon {
+  opacity: 1;
+  transform: scale(1);
+  animation: checkmark-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes checkmark-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-45deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Pulse effect when copied */
+.copy-button.copied::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.3);
+  transform: translate(-50%, -50%);
+  animation: pulse-effect 0.6s ease-out;
+}
+
+@keyframes pulse-effect {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+  }
 }
 
 /* Instructions Card */
@@ -205,70 +312,118 @@ body {
 
 .right-section {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   height: 100%;
   min-height: 600px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
 }
+
+.right-section ngx-stories {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
 
 /* ==================== Responsive Design ==================== */
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1400px) {
   .page-container {
     gap: 3rem;
+    padding: 1.75rem;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .page-container {
+    gap: 2.5rem;
     padding: 1.5rem;
   }
 
   .main-title {
     font-size: 3rem;
   }
+
+  .left-section {
+    max-width: 600px;
+  }
 }
 
 @media screen and (max-width: 1024px) {
   .page-container {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 3rem;
+    padding: 2rem 1.5rem;
   }
 
   .left-section {
     max-width: 100%;
+    padding: 0;
   }
 
   .angular-badge {
-    position: static;
-    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.875rem;
+    margin-bottom: 0.75rem;
   }
 
   .main-title {
     margin-top: 0;
+    font-size: 2.75rem;
   }
 
   .right-section {
     min-height: 500px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
   }
 }
 
 @media screen and (max-width: 768px) {
   .page-container {
-    padding: 1.25rem;
+    padding: 1.5rem 1.25rem;
+    gap: 2.5rem;
   }
 
   .main-title {
     font-size: 2.5rem;
+    line-height: 1.2;
   }
 
   .description-text {
     font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .left-section {
+    gap: 1.25rem;
   }
 
   .install-container {
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .install-code {
+    word-break: break-all;
+    text-align: center;
   }
 
   .copy-button {
     justify-content: center;
+    width: 100%;
+    min-height: 44px; /* Better touch target */
+  }
+
+  .instructions-container {
+    margin-top: 0.5rem;
   }
 
   .instructions-header {
@@ -280,45 +435,193 @@ body {
     font-size: 0.875rem;
     padding: 0.875rem 1.25rem;
     gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .instruction-row span {
+    flex: 1;
+    min-width: 200px;
   }
 
   .instruction-row svg {
     width: 18px;
     height: 18px;
+    flex-shrink: 0;
+  }
+
+  .docs-link {
+    font-size: 0.95rem;
   }
 
   .right-section {
     min-height: 450px;
+    width: 100%;
+    padding: 0;
+  }
+
+  .footer-credits {
+    padding-top: 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .page-container {
+    padding: 1.25rem 1rem;
+    gap: 2rem;
+  }
+
+  .main-title {
+    font-size: 2.25rem;
+  }
+
+  .right-section {
+    min-height: 400px;
   }
 }
 
 @media screen and (max-width: 480px) {
   .page-container {
-    padding: 1rem;
+    padding: 1rem 0.875rem;
+    gap: 1.5rem;
+  }
+
+  .left-section {
+    gap: 1rem;
   }
 
   .main-title {
     font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  .description-text {
+    font-size: 0.9rem;
   }
 
   .install-container {
-    padding: 0.875rem 1rem;
+    padding: 0.875rem;
+    border-radius: 10px;
   }
 
   .install-code {
     font-size: 0.875rem;
+    padding: 0.25rem 0;
   }
 
   .copy-button {
     font-size: 0.8rem;
-    padding: 0.5rem 0.875rem;
+    padding: 0.625rem 0.875rem;
+    min-height: 44px;
+  }
+
+  .copy-button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .instructions-header {
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .instruction-row {
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+    gap: 0.625rem;
+  }
+
+  .instruction-row svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .instruction-row span {
+    min-width: auto;
+  }
+
+  .docs-link {
+    font-size: 0.9rem;
+  }
+
+  .docs-link svg {
+    width: 14px;
+    height: 14px;
   }
 
   .right-section {
     min-height: 400px;
   }
 
+  .angular-badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .angular-badge .angular-icon {
+    width: 18px;
+    height: 18px;
+  }
+
   .footer-credits {
     font-size: 0.875rem;
+    padding-top: 1rem;
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .page-container {
+    padding: 0.875rem 0.75rem;
+  }
+
+  .main-title {
+    font-size: 1.75rem;
+  }
+
+  .install-code {
+    font-size: 0.8rem;
+  }
+
+  .copy-button {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .instruction-row {
+    font-size: 0.8rem;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .right-section {
+    min-height: 350px;
+  }
+}
+
+/* Landscape orientation on mobile devices */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .page-container {
+    padding: 1rem;
+    gap: 1.5rem;
+    align-items: flex-start;
+    min-height: auto;
+  }
+
+  .main-title {
+    font-size: 1.75rem;
+    margin-top: 0;
+  }
+
+  .left-section {
+    gap: 0.75rem;
+  }
+
+  .footer-credits {
+    padding-top: 0.75rem;
+  }
+
+  .right-section {
+    min-height: 300px;
   }
 }

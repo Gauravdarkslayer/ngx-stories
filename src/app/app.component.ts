@@ -1,16 +1,17 @@
 import { Component, Type } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projects/ngx-stories/src/public-api';
 import { CustomComponentComponent } from './components/custom-component/custom-component.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgxStoriesComponent],
+  imports: [NgxStoriesComponent, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  installIcon: string = 'assets/images/copy.png';
+  isCopied: boolean = false;
   storyOptions: NgxStoriesOptions = {
     // Tweak these options as needed
     // width: 338,
@@ -60,10 +61,13 @@ export class AppComponent {
   }
 
   copyCommand() {
-    navigator.clipboard.writeText('npm i ngx-stories');
-    this.installIcon = 'assets/images/copy-done.svg';
-    setTimeout(() => {
-      this.installIcon = 'assets/images/copy.png';
-    }, 3000);
+    navigator.clipboard.writeText('npm i ngx-stories').then(() => {
+      this.isCopied = true;
+      setTimeout(() => {
+        this.isCopied = false;
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy text: ', err);
+    });
   }
 }
