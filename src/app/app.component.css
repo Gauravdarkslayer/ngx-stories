@@ -41,7 +41,18 @@ body {
   width: 100%;
 }
 
-/* Angular Badge */
+/* Angular Logo */
+.angularlogo {
+  display: block;
+  margin: 0.5rem auto 1.5rem auto;
+  width: auto;
+  height: auto;
+  max-width: 110px;
+  max-height: 50px;
+  object-fit: contain;
+}
+
+/* Angular Badge - kept for backwards compatibility */
 .angular-badge {
   display: flex;
   align-items: center;
@@ -338,6 +349,18 @@ body {
   }
 }
 
+@media screen and (min-width: 1401px) {
+  .angularlogo {
+    margin-top: 0.75rem;
+  }
+}
+
+@media screen and (min-width: 1600px) {
+  .angularlogo {
+    margin-top: 0.5rem;
+  }
+}
+
 @media screen and (max-width: 1200px) {
   .page-container {
     gap: 2.5rem;
@@ -363,6 +386,13 @@ body {
   .left-section {
     max-width: 100%;
     padding: 0;
+  }
+
+  .angularlogo {
+    margin-top: 0.75rem;
+    margin-bottom: 1rem;
+    max-width: 100px;
+    max-height: 45px;
   }
 
   .angular-badge {
@@ -551,6 +581,13 @@ body {
 
   .right-section {
     min-height: 400px;
+  }
+
+  .angularlogo {
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+    max-width: 90px;
+    max-height: 40px;
   }
 
   .angular-badge {

@@ -61,7 +61,7 @@ export class AppComponent {
   }
 
   copyCommand() {
-    navigator.clipboard.writeText('npm i ngx-stories').then(() => {
+    navigator.clipboard.writeText('npm install ngx-stories').then(() => {
       this.isCopied = true;
       setTimeout(() => {
         this.isCopied = false;
