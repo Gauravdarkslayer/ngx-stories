@@ -14,14 +14,18 @@
 
 
     <div class="install-container">
-      <code class="install-code">npm i ngx-stories</code>
-      <button class="copy-button" (click)="copyCommand()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          aria-label="Copy icon" role="img">
+      <code class="install-code">npm install ngx-stories</code>
+      <button class="copy-button" [class.copied]="isCopied" (click)="copyCommand()">
+        <svg *ngIf="!isCopied" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          aria-label="Copy icon" role="img" class="copy-icon">
           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
         </svg>
-        <span>Copy</span>
+        <svg *ngIf="isCopied" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          aria-label="Checkmark icon" role="img" class="check-icon">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>{{ isCopied ? 'Copied!' : 'Copy' }}</span>
       </button>
     </div>
 
@@ -75,19 +79,13 @@
   </div>
 
   <div class="right-section">
-    <div class="angular-badge">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        aria-label="Copy icon" role="img">
-        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-        <polyline points="2 17 12 22 22 17"></polyline>
-        <polyline points="2 12 12 17 22 12"></polyline>
-      </svg>
-      <span>Angular</span>
+    <img width="110" height="50" class="angularlogo" src="assets/images/angular.png" alt="Angular logo">
+    <div class="stories-wrapper">
+      <ngx-stories [storyGroups]="storyGroups" [options]="storyOptions" backlitColor="#1b1b1b"
+        (triggerOnEnd)="triggerOnEnd()" (triggerOnExit)="triggerOnExit()"
+        (onStoryGroupChange)="triggerOnStoryGroupChange($event)" (triggerOnStoryChange)="currentStoryDetails($event)">
+      </ngx-stories>
     </div>
-    <ngx-stories [storyGroups]="storyGroups" [options]="storyOptions" backlitColor="#1b1b1b"
-      (triggerOnEnd)="triggerOnEnd()" (triggerOnExit)="triggerOnExit()"
-      (onStoryGroupChange)="triggerOnStoryGroupChange($event)" (triggerOnStoryChange)="currentStoryDetails($event)">
-    </ngx-stories>
   </div>
 
 </div>
