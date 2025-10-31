@@ -4,9 +4,24 @@ An Angular component to render instagram like stories.
 
 [![npm downloads](https://img.shields.io/npm/dt/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
 [![npm version](https://img.shields.io/npm/v/ngx-stories)](https://www.npmjs.com/package/ngx-stories)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-## Screenshot
-![Story Screenshot](./assets/images/story-screenshot.png)
+---
+
+## Table of Contents
+- [Screenshot](#screenshot)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Properties](#properties)
+- [Options](#options)
+- [Event Example](#event-example)
+- [Features](#features)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+## Demo
+![Story Screenshot](./assets/images/ngxstories.gif)
 
 
 ## For Version 17+
@@ -20,8 +35,11 @@ npm install ngx-stories
 ```
 
 ```ts
+### Import the component:
 import { NgxStoriesComponent, StoryGroup } from 'ngx-stories';
-
+```
+## Usage
+```
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -53,6 +71,14 @@ export class AppComponent {
 <ngx-stories [storyGroups]="storyGroups"></ngx-stories>
 ```
 
+### Event Example
+```
+onStoryEnd() {
+  console.log('All stories completed!');
+  // Add any action like redirect, toast, or analytics
+}
+```
+
 ## Properties
 | Property           | Type                  | Required | Description                                                                                                  |
 |--------------------|-----------------------|----------|--------------------------------------------------------------------------------------------------------------|
@@ -64,7 +90,7 @@ export class AppComponent {
 | `onStoryGroupChange` | `EventEmitter<number>`  | No       | Output event that is triggered when the user changes the storyGroup.
 | `triggerOnStoryChange` | `EventEmitter<object>`  | No       | Output event that is triggered when the user changes the story.
 
-
+### Options:
 ```ts
 interface NgxStoriesOptions {
   width: number, // width of story
@@ -89,7 +115,14 @@ interface NgxStoriesOptions {
 * Auto-assigning unique ids to storyGroups and stories.
 
 ## Contributing
-[Contributing Guide](https://github.com/Gauravdarkslayer/ngx-stories/blob/main/CONTRIBUTING.md)
+* Fork the repository
+* Create a new branch: git checkout -b feature-name
+* Make your changes
+* Commit: git commit -m "feat: add your feature"
+* Push to branch: git push origin feature-name
+* Open a Pull Request
+* Please follow the Contributing Guide:
+  [Contributing Guide](https://github.com/Gauravdarkslayer/ngx-stories/blob/main/CONTRIBUTING.md)
 
 ## License
 This library is licensed under the MIT License. Feel free to use and modify the code as per your needs.
