@@ -1,16 +1,19 @@
-import { Component, Type } from '@angular/core';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projects/ngx-stories/src/public-api';
 import { CustomComponentComponent } from './components/custom-component/custom-component.component';
+import { BackgroundEffectComponent } from './components/background-effect/background-effect.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgxStoriesComponent],
+  imports: [NgxStoriesComponent, CommonModule, BackgroundEffectComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
 export class AppComponent {
   installIcon: string = 'assets/images/copy.png';
+  isCopied: boolean = false;
   storyOptions: NgxStoriesOptions = {
     // Tweak these options as needed
     // width: 338,
@@ -61,9 +64,9 @@ export class AppComponent {
 
   copyCommand() {
     navigator.clipboard.writeText('npm i ngx-stories');
-    this.installIcon = 'assets/images/copy-done.svg';
+    this.isCopied = true;
     setTimeout(() => {
-      this.installIcon = 'assets/images/copy.png';
-    }, 3000);
+      this.isCopied = false;
+    }, 2000);
   }
 }
