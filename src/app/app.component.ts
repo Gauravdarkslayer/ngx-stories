@@ -1,4 +1,4 @@
-import { Component, Type } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxStoriesComponent, NgxStoriesOptions, StoryGroup } from '../../projects/ngx-stories/src/public-api';
 import { CustomComponentComponent } from './components/custom-component/custom-component.component';

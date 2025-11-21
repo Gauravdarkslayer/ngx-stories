@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 // @ts-ignore
 import BIRDS from 'vanta/dist/vanta.birds.min';
 import * as THREE from 'three';
