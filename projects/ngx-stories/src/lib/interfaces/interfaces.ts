@@ -1,7 +1,7 @@
 import { Component, Type } from "@angular/core";
 
 export type StoryType = 'image' | 'video' | 'component';
-export type StoryStateType = 'playing' | 'paused' | 'holding' | 'buffering' ;
+export type StoryStateType = 'playing' | 'paused' | 'holding' | 'buffering';
 export interface Story {
     id?: string,
     type: StoryType,
@@ -19,5 +19,6 @@ export interface NgxStoriesOptions {
     height?: number,
     currentStoryIndex?: number,
     currentStoryGroupIndex?: number,
-    backlitColor?: string
+    backlitColor?: string,
+    enableGradientBackground?: boolean
 }

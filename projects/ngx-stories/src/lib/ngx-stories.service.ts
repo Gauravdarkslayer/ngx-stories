@@ -103,4 +103,40 @@ export class NgxStoriesService {
     }
     return storyGroups;
   }
+
+  parseColor(colorStr: string): number[] {
+    // Handle "rgb(r, g, b)" or hex (though getDominantColors returns rgb or hex)
+    if (colorStr.startsWith('rgb')) {
+      const parts = colorStr.match(/\d+/g);
+      if (parts && parts.length >= 3) {
+        return [parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2])];
+      }
+    } else if (colorStr.startsWith('#')) {
+      const hex = colorStr.substring(1);
+      const bigint = parseInt(hex, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return [r, g, b];
+    }
+    return [0, 0, 0]; // Default black
+  }
+
+  lerp(start: number, end: number, t: number): number {
+    return start * (1 - t) + end * t;
+  }
+
+  lerpColor(start: number[], end: number[], t: number): number[] {
+    return [
+      this.lerp(start[0], end[0], t),
+      this.lerp(start[1], end[1], t),
+      this.lerp(start[2], end[2], t)
+    ];
+  }
+
+  getDefaultParsedColors(options: NgxStoriesOptions): number[][] {
+    const defaultColor = options?.backlitColor || '#1b1b1b';
+    const parsed = this.parseColor(defaultColor);
+    return [parsed, parsed];
+  }
 }

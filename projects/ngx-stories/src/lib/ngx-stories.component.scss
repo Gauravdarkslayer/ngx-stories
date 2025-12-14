@@ -130,7 +130,8 @@ button:hover {
   justify-content: space-between;
   align-items: center;
   z-index: 1;
-  h5{
+
+  h5 {
     color: white;
   }
 
@@ -186,6 +187,31 @@ button:hover {
   justify-content: center;
   height: inherit;
   width: inherit;
+  position: relative;
+
+  /* Apply blur effect only when this class is present (non-component stories) */
+  &.blurred-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    /* Inherit the gradient from parent */
+    filter: blur(20px);
+    /* Apply blur to background only */
+    opacity: 0.65;
+    /* Reduce opacity of background */
+    z-index: -1;
+    /* Place behind content */
+  }
+
+  /* Ensure content stays sharp and above background */
+  >* {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 .loading-spinner {
@@ -212,7 +238,7 @@ button:hover {
 
 @media (min-width: 768px) {
   .story-content-container {
-    .story-controls  {
+    .story-controls {
       display: flex;
       height: fit-content;
       align-items: center;
