@@ -20,7 +20,8 @@ export class AppComponent {
     // height: 600,
     // currentStoryIndex: 0,
     // currentStoryGroupIndex: 0,
-    backlitColor: '#1b1b1b'
+    backlitColor: '#000',
+    enableGradientBackground: true
   };
   readonly storyGroups: StoryGroup[] = [
     {

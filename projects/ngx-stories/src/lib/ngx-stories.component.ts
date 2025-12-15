@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren, HostListener, ViewChild, ViewContainerRef, Type } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren, HostListener, ViewChild, ViewContainerRef, Type, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HammerModule } from '@angular/platform-browser';
 import { StoryGroup, StoryStateType } from '../lib/interfaces/interfaces';
@@ -58,10 +58,8 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   constructor(
     private storyService: NgxStoriesService,
-  ) {
-
-
-  }
+    private cdr: ChangeDetectorRef
+  ) { }
 
 
   //Use Keyboard Navigations to control the stories
@@ -87,6 +85,7 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   ngOnDestroy(): void {
     clearInterval(this.intervalId);
+    this.stopVideoBackgroundUpdate();
   }
 
   ngAfterViewInit(): void {
@@ -99,6 +98,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     let storyDuration = 5000; // Default duration (in milliseconds) for images
     if (currentStory.type === 'video') {
       const videoElement: HTMLVideoElement = document.createElement('video');
+      videoElement.crossOrigin = 'anonymous';
       videoElement.src = currentStory.content as string;
 
       // Use the video duration or a default if not available
@@ -117,6 +117,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     } else {
       // Handling for images
       const imageElement = document.createElement('img');
+      imageElement.crossOrigin = 'anonymous';
       imageElement.src = currentStory.content as string;
 
       // Check if the image is cached
@@ -218,6 +219,7 @@ export class NgxStoriesComponent implements AfterViewInit {
 
     this.currentStoryGroupIndex = storyGroupIndex;
     this.currentStoryIndex = storyIndex;
+    this.resetBackground();
 
     //Trigger onEnd emitter when all the storieGroups are traversed.
     if (this.currentStoryGroupIndex === this.storyGroups.length) {
@@ -249,7 +251,8 @@ export class NgxStoriesComponent implements AfterViewInit {
           videoElement.muted = !this.isAudioEnabled;
           videoElement.play().catch(err => {
             console.error(err);
-          })
+          });
+          this.startVideoBackgroundUpdate(videoElement);
         }
       }
     }, 0);
@@ -257,6 +260,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   private pauseCurrentVideo(seek: null | boolean = null) {
+    this.stopVideoBackgroundUpdate();
     // Pause all videos in all story containers
     this.storyContainers?.forEach(container => {
       const videos = container.nativeElement.querySelectorAll('video');
@@ -267,13 +271,23 @@ export class NgxStoriesComponent implements AfterViewInit {
     });
   }
 
+  private resetBackground() {
+    const defaultColor = this.options.backlitColor || '#1b1b1b';
+    this.currentStoryBackground = defaultColor;
+    const parsedRef = this.storyService.parseColor(defaultColor);
+    this.currentColors = [[...parsedRef], [...parsedRef]];
+    this.targetColors = [[...parsedRef], [...parsedRef]];
+    this.cdr.detectChanges();
+  }
+
   private goToNextStoryGroup() {
-    this.pauseCurrentVideo(true); 
+    this.pauseCurrentVideo(true);
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     this.currentStoryGroupIndex = (this.currentStoryGroupIndex + 1) % this.storyGroups.length;
     if (this.hasReachedEndOfStories()) return;
     this.currentStoryIndex = 0;
+    this.resetBackground();
     clearInterval(this.intervalId);
     this.progressWidth = 0;
     this.storyGroupChange();
@@ -288,6 +302,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     if (this.isTransitioning) return;
     this.isTransitioning = true;
     this.currentStoryIndex = 0;
+    this.resetBackground();
     clearInterval(this.intervalId);
     if (this.currentStoryGroupIndex !== 0 && this.storyGroups.length > this.currentStoryGroupIndex) {
       this.currentStoryGroupIndex--;
@@ -398,10 +413,164 @@ export class NgxStoriesComponent implements AfterViewInit {
     }
   }
 
+  private videoFrameId: any;
+  private canvas: HTMLCanvasElement | null = null;
+  private context: CanvasRenderingContext2D | null = null;
+
+  // Store current and target colors for interpolation
+  private currentColors: number[][] = [[0, 0, 0], [0, 0, 0]];
+  private targetColors: number[][] = [[0, 0, 0], [0, 0, 0]];
+
+  currentStoryBackground: string = 'black';
+
+  // ...
+
   // When content (image or video) has loaded
   onContentLoaded() {
     this.isLoading = false;
+    setTimeout(() => {
+      // For images, we can update immediately or animate. 
+      // Let's just update immediately for now, or let the loop handle it if it's a video.
+      this.updateBackground();
+    }, 0);
   }
+
+  updateBackground() {
+    if (!this.storyContainers) return;
+    const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex];
+    if (!activeStoryContainer) return;
+
+    // Check if current story is a component or if gradient background is disabled
+    const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
+    if (currentStory.type === 'component' || !this.options.enableGradientBackground) {
+      this.currentStoryBackground = this.options.backlitColor || '#1b1b1b';
+      return;
+    }
+
+    const activeStoryContent = activeStoryContainer.nativeElement.querySelector('.story-content.active');
+    if (!activeStoryContent) return;
+
+    const mediaElement = activeStoryContent.querySelector('img, video');
+    if (mediaElement) {
+      try {
+        const hexOrRgbColors = this.getDominantColors(mediaElement);
+        // Parse returned colors to RGB arrays for interpolation
+        this.targetColors = hexOrRgbColors.map(c => this.storyService.parseColor(c));
+
+        // If it's an image (not video loop), we might want to snap or animate once.
+        // But since updateBackground is called once for images, we can just apply it.
+        if (mediaElement.tagName.toLowerCase() === 'img') {
+          this.currentColors = this.targetColors;
+          this.applyGradient();
+        }
+
+      } catch (e) {
+        this.targetColors = this.storyService.getDefaultParsedColors(this.options);
+      }
+    } else {
+      this.targetColors = this.storyService.getDefaultParsedColors(this.options);
+    }
+  }
+
+  startVideoBackgroundUpdate(videoElement: HTMLVideoElement) {
+    if (!this.options.enableGradientBackground) return;
+    this.stopVideoBackgroundUpdate();
+    let frameCount = 0;
+
+    const update = () => {
+      if (videoElement.paused || videoElement.ended) {
+        this.stopVideoBackgroundUpdate();
+        return;
+      }
+
+      // 1. Update Target Colors (Throttled)
+      if (frameCount % 10 === 0) {
+        this.updateBackground(); // This updates this.targetColors
+      }
+
+      // 2. Interpolate Current Colors towards Target Colors (Every Frame)
+      // Factor 0.05 for very smooth, slow transition. 0.1 for faster.
+      const factor = 0.05;
+      this.currentColors = [
+        this.storyService.lerpColor(this.currentColors[0], this.targetColors[0], factor),
+        this.storyService.lerpColor(this.currentColors[1], this.targetColors[1], factor)
+      ];
+
+      // 3. Apply to DOM
+      this.applyGradient();
+
+      frameCount++;
+      this.videoFrameId = requestAnimationFrame(update);
+    };
+    this.videoFrameId = requestAnimationFrame(update);
+  }
+
+  private applyGradient() {
+    const c1 = `rgb(${Math.round(this.currentColors[0][0])}, ${Math.round(this.currentColors[0][1])}, ${Math.round(this.currentColors[0][2])})`;
+    const c2 = `rgb(${Math.round(this.currentColors[1][0])}, ${Math.round(this.currentColors[1][1])}, ${Math.round(this.currentColors[1][2])})`;
+    this.currentStoryBackground = `linear-gradient(to bottom, ${c1}, ${c2})`;
+  }
+
+  stopVideoBackgroundUpdate() {
+    if (this.videoFrameId) {
+      cancelAnimationFrame(this.videoFrameId);
+      this.videoFrameId = null;
+    }
+  }
+
+  getDominantColors(source: HTMLImageElement | HTMLVideoElement): string[] {
+    if (!this.canvas) {
+      this.canvas = document.createElement('canvas');
+      this.canvas.width = 50;
+      this.canvas.height = 50;
+      this.context = this.canvas.getContext('2d');
+    }
+
+    if (!this.context) return [this.options.backlitColor || '#1b1b1b', this.options.backlitColor || '#1b1b1b'];
+
+    try {
+      this.context.drawImage(source, 0, 0, 50, 50);
+      const imageData = this.context.getImageData(0, 0, 50, 50);
+      const data = imageData.data;
+      const colorCounts: { [key: string]: number } = {};
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+
+        if (a < 128) continue; // Skip transparent
+
+        // Simple brightness check
+        const brightness = (r + g + b) / 3;
+        // Exclude very dark colors (brightness < 40) to avoid black/near-black in gradients
+        if (brightness < 40) continue;
+
+        // Quantize to nearest 20 to group similar colors and reduce noise
+        const qR = Math.round(r / 20) * 20;
+        const qG = Math.round(g / 20) * 20;
+        const qB = Math.round(b / 20) * 20;
+
+        const key = `${qR},${qG},${qB}`;
+        colorCounts[key] = (colorCounts[key] || 0) + 1;
+      }
+
+      const sortedColors = Object.entries(colorCounts)
+        .sort((a, b) => b[1] - a[1])
+        .map(entry => entry[0]);
+
+      if (sortedColors.length === 0) return ['#000000', '#000000'];
+      if (sortedColors.length === 1) return [`rgb(${sortedColors[0]})`, `rgb(${sortedColors[0]})`];
+
+      return [`rgb(${sortedColors[0]})`, `rgb(${sortedColors[1]})`];
+
+    } catch (e) {
+      console.warn('Failed to extract gradient colors, using default background:', e);
+      return [this.options.backlitColor || '#1b1b1b', this.options.backlitColor || '#1b1b1b'];
+    }
+  }
+
 
   // When content is buffering/loading
   onContentBuffering() {

@@ -68,7 +68,8 @@ interface NgxStoriesOptions {
   height: number, // height of story
   currentStoryIndex: 0, // index from where stories should start
   currentStoryGroupIndex: 0, // index from where story group should start
-  backlitColor: string // background color of story default is #1b1b1b
+  backlitColor: string, // background color of story default is #1b1b1b (for custom components or when gradient disabled)
+  enableGradientBackground: boolean // Enable/Disable blurred gradient background (default: true)
 }
 ```
 
@@ -84,6 +85,7 @@ interface NgxStoriesOptions {
 * Audio controls: Toggle audio on/off for stories that have audio.
 * Component based stories for best control.
 * Auto-assigning unique ids to storyGroups and stories.
+* **Blurred Gradient Background**: Automatically generates a blurred gradient background based on the dominant colors of the image or video story. (Note: Custom components always use the default black background).
 
 ## Contributing
 [Contributing Guide](https://github.com/Gauravdarkslayer/ngx-stories/blob/main/CONTRIBUTING.md)
