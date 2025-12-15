@@ -1,8 +1,11 @@
 import { ComponentFixture, fakeAsync, TestBed, tick, flush } from '@angular/core/testing';
+import { Component } from '@angular/core';
 import { NgxStoriesComponent } from './ngx-stories.component';
 import { StoryGroup } from './interfaces/interfaces';
 import { NgxStoriesService } from './ngx-stories.service';
-import { of } from 'rxjs';
+
+@Component({ template: '' })
+class DummyComponent { }
 
 class MockNgxStoriesService {
   assignIdsIfMissing(groups: StoryGroup[]) { return groups; }
@@ -97,7 +100,7 @@ describe('NgxStoriesComponent', () => {
   it('should set background to black for component stories', fakeAsync(() => {
     const mockGroups: StoryGroup[] = [{
       id: '1', name: 'Test', stories: [
-        { id: '1', type: 'component', content: 'SomeString' }
+        { id: '1', type: 'component', content: DummyComponent }
       ]
     }];
     component.storyGroups = mockGroups;

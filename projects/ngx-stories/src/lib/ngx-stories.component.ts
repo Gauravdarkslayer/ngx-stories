@@ -59,10 +59,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   constructor(
     private storyService: NgxStoriesService,
     private cdr: ChangeDetectorRef
-  ) {
-
-
-  }
+  ) { }
 
 
   //Use Keyboard Navigations to control the stories
@@ -278,8 +275,8 @@ export class NgxStoriesComponent implements AfterViewInit {
     const defaultColor = this.options.backlitColor || '#1b1b1b';
     this.currentStoryBackground = defaultColor;
     const parsedRef = this.storyService.parseColor(defaultColor);
-    this.currentColors = [parsedRef, parsedRef];
-    this.targetColors = [parsedRef, parsedRef];
+    this.currentColors = [[...parsedRef], [...parsedRef]];
+    this.targetColors = [[...parsedRef], [...parsedRef]];
     this.cdr.detectChanges();
   }
 
@@ -416,7 +413,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     }
   }
 
-  videoFrameId: any;
+  private videoFrameId: any;
   private canvas: HTMLCanvasElement | null = null;
   private context: CanvasRenderingContext2D | null = null;
 

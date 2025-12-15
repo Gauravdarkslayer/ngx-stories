@@ -112,7 +112,11 @@ export class NgxStoriesService {
         return [parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2])];
       }
     } else if (colorStr.startsWith('#')) {
-      const hex = colorStr.substring(1);
+      let hex = colorStr.substring(1);
+      // Expand 3-char shorthand to 6-char
+      if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+      }
       const bigint = parseInt(hex, 16);
       const r = (bigint >> 16) & 255;
       const g = (bigint >> 8) & 255;
