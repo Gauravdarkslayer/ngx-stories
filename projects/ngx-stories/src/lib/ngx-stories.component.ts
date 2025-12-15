@@ -56,6 +56,8 @@ export class NgxStoriesComponent implements AfterViewInit {
   // Add a ViewContainerRef to inject dynamic components
   @ViewChild('dynamicComponentContainer', { read: ViewContainerRef, static: false }) dynamicComponentContainer!: ViewContainerRef;
 
+  private hammerInstances: any[] = [];
+
   constructor(
     private storyService: NgxStoriesService,
     private cdr: ChangeDetectorRef
@@ -86,6 +88,8 @@ export class NgxStoriesComponent implements AfterViewInit {
   ngOnDestroy(): void {
     clearInterval(this.intervalId);
     this.stopVideoBackgroundUpdate();
+    this.hammerInstances.forEach(hammer => hammer.destroy());
+    this.hammerInstances = [];
   }
 
   ngAfterViewInit(): void {
@@ -97,23 +101,19 @@ export class NgxStoriesComponent implements AfterViewInit {
     const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
     let storyDuration = 5000; // Default duration (in milliseconds) for images
     if (currentStory.type === 'video') {
-      const videoElement: HTMLVideoElement = document.createElement('video');
-      videoElement.crossOrigin = 'anonymous';
-      videoElement.src = currentStory.content as string;
-
-      // Use the video duration or a default if not available
-      videoElement.onloadedmetadata = () => {
-        this.onContentLoaded(); // Call when metadata is loaded
-        storyDuration = videoElement.duration * 1000; // Convert to milliseconds
-        this.startProgressInterval(storyDuration);
-      };
+      // Video loading is handled by the template events (loadeddata, playing)
+      // which call onContentLoaded()
     } else if (currentStory.type === 'component') {
-      setTimeout(() => {
-        // Small delay to detect changes in DOM
+      if (this.dynamicComponentContainer) {
+        this.cdr.detectChanges();
         this.storyService.renderComponent(this.dynamicComponentContainer, currentStory.content as Type<any>);
         this.onContentLoaded();
         this.startProgressInterval(5000); // Default duration for components
-      }, 100);
+      } else {
+        console.warn('dynamicComponentContainer not available for component rendering.');
+        this.onContentLoaded();
+        this.startProgressInterval(storyDuration); // Fallback to default duration
+      }
     } else {
       // Handling for images
       const imageElement = document.createElement('img');
@@ -171,6 +171,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       hammer.on('swiperight', () => this.handleSwipe('right'));
       hammer.on('swipedown', () => this.handleSwipe('down'));
       hammer.on('swipeup', () => this.handleSwipe('up'));
+      this.hammerInstances.push(hammer);
     });
     this.storyService.setOptions(this.options, this.storyContainers);
   }
@@ -428,6 +429,19 @@ export class NgxStoriesComponent implements AfterViewInit {
   // When content (image or video) has loaded
   onContentLoaded() {
     this.isLoading = false;
+    const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
+
+    if (currentStory.type === 'video') {
+      const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex];
+      const activeStoryContent = activeStoryContainer?.nativeElement.querySelector('.story-content.active');
+      const videoElement: HTMLVideoElement | null = activeStoryContent?.querySelector('video');
+      let storyDuration = 5000;
+      if (videoElement && videoElement.duration) {
+        storyDuration = videoElement.duration * 1000;
+      }
+      this.startProgressInterval(storyDuration);
+    }
+
     setTimeout(() => {
       // For images, we can update immediately or animate. 
       // Let's just update immediately for now, or let the loop handle it if it's a video.
