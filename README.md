@@ -138,7 +138,7 @@ interface StoryChange {
 - **Escape**: triggers `triggerOnExit`.
 
 ### Background Effects
-- **Gradient Background**: Automatically extracts dominant colors from the image/video and creates a dynamic, smooth gradient background (similar to Instagram). Can be disabled via `options.enableGradientBackground: false`.
+- **Gradient Background**: Automatically extracts dominant colors from the image/video and creates a dynamic, smooth gradient background (similar to Instagram). This can be disabled via `options.enableGradientBackground: false`.
 - **Backlit Color**: Fallback background color if gradient is disabled or color extraction fails.
 
 ### Media Support

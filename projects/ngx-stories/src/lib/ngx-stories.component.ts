@@ -542,12 +542,12 @@ export class NgxStoriesComponent implements AfterViewInit {
 
         if (a < 128) continue; // Skip transparent
 
-        // Exclude dark colors (black)
         // Simple brightness check
         const brightness = (r + g + b) / 3;
-        if (brightness < 40) continue; // Threshold for "black"
+        // Exclude very dark colors (brightness < 40) to avoid black/near-black in gradients
+        if (brightness < 40) continue;
 
-        // Quantize to group similar colors
+        // Quantize to nearest 20 to group similar colors and reduce noise
         const qR = Math.round(r / 20) * 20;
         const qG = Math.round(g / 20) * 20;
         const qB = Math.round(b / 20) * 20;
@@ -566,7 +566,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       return [`rgb(${sortedColors[0]})`, `rgb(${sortedColors[1]})`];
 
     } catch (e) {
-      // console.error('Error extracting color', e);
+      console.warn('Failed to extract gradient colors, using default background:', e);
       return [this.options.backlitColor || '#1b1b1b', this.options.backlitColor || '#1b1b1b'];
     }
   }
