@@ -12,11 +12,11 @@
       </h5>
 
       <div class="story-controls">
-        <button (click)="togglePause()" class="pause-play"
+        <button (click)="togglePause()" class="pause-play" aria-label="Play/Pause Story"
           [ngClass]="{ 'pause-icon': storyState==='paused', 'play-icon': storyState==='playing' || storyState==='buffering'}">
         </button>
         @if(story.type === 'video') {
-        <button class="video-audio-icon" (click)="toggleAudio()"
+        <button class="video-audio-icon" (click)="toggleAudio()" aria-label="Mute/Unmute Video"
           [ngClass]="{ 'audio-enabled': isAudioEnabled, 'audio-disabled': !isAudioEnabled }">
         </button>
         }
@@ -44,12 +44,19 @@
     <div class="story-main-content-container">
       <div [style.background]="currentStoryBackground" class="story-style"
         [class.blurred-bg]="story.type !== 'component' && options.enableGradientBackground">
+        @if(isContentError) {
+        <div class="error-message">
+          <p>Something went wrong while displaying the content.</p>
+        </div>
+        }
         @if(story.type === 'image') {
-        <img [src]="story.content" alt="user story" crossorigin="anonymous" (load)="onContentLoaded()"
-          (error)="onContentError()">
+        <img [src]="story.content" [style.display]="isContentError ? 'none' : 'block'" alt="user story"
+          [attr.crossorigin]="story.crossOrigin === undefined ? 'anonymous' : story.crossOrigin"
+          (load)="onContentLoaded()" (error)="onContentError()">
         } @else if(story.type === 'video') {
-        <video [src]="story.content" crossorigin="anonymous" (loadeddata)="onContentLoaded()"
-          (waiting)="onContentBuffering()" (playing)="onContentLoaded()"></video>
+        <video [src]="story.content" [style.display]="isContentError ? 'none' : 'block'"
+          [attr.crossorigin]="story.crossOrigin === undefined ? 'anonymous' : story.crossOrigin"
+          (waiting)="onContentBuffering()" (playing)="onContentLoaded()" (error)="onContentError()"></video>
         } @else if(story.type === 'component') {
         <ng-container #dynamicComponentContainer></ng-container>
         }

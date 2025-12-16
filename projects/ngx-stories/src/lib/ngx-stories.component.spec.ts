@@ -1,7 +1,7 @@
-import { ComponentFixture, fakeAsync, TestBed, tick, flush } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, flush, discardPeriodicTasks } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { NgxStoriesComponent } from './ngx-stories.component';
-import { StoryGroup } from './interfaces/interfaces';
+import { StoryGroup, StoryType } from '../lib/interfaces/interfaces';
 import { NgxStoriesService } from './ngx-stories.service';
 
 @Component({ template: '' })
@@ -140,6 +140,20 @@ describe('NgxStoriesComponent', () => {
     flush();
   }));
 
+  it('should remove crossorigin attribute if explicitly null', () => {
+    const mockGroups: StoryGroup[] = [{
+      id: '1', name: 'Test', stories: [
+        { id: '1', type: 'video', content: 'vid.mp4', crossOrigin: null }
+      ]
+    }];
+    component.storyGroups = mockGroups;
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    const videoEl = fixture.nativeElement.querySelector('video');
+    expect(videoEl.getAttribute('crossorigin')).toBeNull();
+  });
+
   it('should reset background on transition', fakeAsync(() => {
     const mockGroups: StoryGroup[] = [{
       id: '1', name: 'Test', stories: [
@@ -160,6 +174,39 @@ describe('NgxStoriesComponent', () => {
 
     expect(component.currentStoryBackground).toBe('#1b1b1b');
     expect((component as any).currentColors).toEqual([[27, 27, 27], [27, 27, 27]]);
+    flush();
+  }));
+
+  it('should wait for content to load before starting progress', fakeAsync(() => {
+    spyOn(component, 'startProgressInterval').and.callFake(() => { });
+    component.storyGroups = [
+      {
+        id: '1',
+        name: 'User 1',
+        stories: [
+          { type: 'image', content: 'assets/img.jpg' }
+        ]
+      }
+    ];
+    component.ngOnInit();
+    fixture.detectChanges();
+    component.ngAfterViewInit();
+    tick(); // Process initial setTimeout
+
+    // startStoryProgress is called, but startProgressInterval should NOT be called solely by it, 
+    // it waits for image load.
+
+    // Reset spy to ignore any initial calls if any (though logic says it shouldn't)
+    (component.startProgressInterval as jasmine.Spy).calls.reset();
+
+    // Verify it's not called yet (simulating loading state)
+    expect(component.startProgressInterval).not.toHaveBeenCalled();
+
+    // Simulate content loaded
+    component.onContentLoaded();
+
+    // Now it should be called
+    expect(component.startProgressInterval).toHaveBeenCalledWith(5000);
     flush();
   }));
 });

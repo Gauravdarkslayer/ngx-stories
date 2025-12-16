@@ -43,6 +43,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   holdTimeout: any; // Timeout for holding the story (pause functionality)
   storyState: StoryStateType = 'playing';
   isLoading: boolean = false;
+  isContentError: boolean = false;
   currentProgressWidth: number = 0;
   isAudioEnabled: boolean = false;
   userInteracted: boolean = false;
@@ -50,13 +51,14 @@ export class NgxStoriesComponent implements AfterViewInit {
   readonly HOLD_DELAY_MS = 500;
   readonly PROGRESS_INTERVAL_MS = 50;
   readonly FULL_PROGRESS_WIDTH = 100;
+  readonly DEFAULT_STORY_DURATION = 5000;
 
   // Queries the story containers in the view for gesture handling
   @ViewChildren('storyContainer') storyContainers!: QueryList<ElementRef>;
   // Add a ViewContainerRef to inject dynamic components
   @ViewChild('dynamicComponentContainer', { read: ViewContainerRef, static: false }) dynamicComponentContainer!: ViewContainerRef;
 
-  private hammerInstances: any[] = [];
+  private hammerInstances: HammerManager[] = [];
 
   constructor(
     private storyService: NgxStoriesService,
@@ -81,7 +83,6 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   ngOnInit(): void {
     this.setStoryOptions();
-    this.startStoryProgress();
     this.storyGroups = this.storyService.assignIdsIfMissing(this.storyGroups);
   }
 
@@ -94,40 +95,47 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.initHammer();
+    // Delay startStoryProgress to avoid ExpressionChangedAfterItHasBeenCheckedError
+    // and ensure ViewChildren are fully initialized for the first story.
+    setTimeout(() => {
+      this.startStoryProgress();
+    });
   }
 
   startStoryProgress() {
+    this.isContentError = false;
     this.onContentBuffering(); // Set loading to true initially
     const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
-    let storyDuration = 5000; // Default duration (in milliseconds) for images
     if (currentStory.type === 'video') {
       // Video loading is handled by the template events (loadeddata, playing)
       // which call onContentLoaded()
     } else if (currentStory.type === 'component') {
+      // Force change detection to ensure dynamicComponentContainer is updated in the view
+      // based on the current index before we try to access it.
+      this.cdr.detectChanges();
       if (this.dynamicComponentContainer) {
-        this.cdr.detectChanges();
         this.storyService.renderComponent(this.dynamicComponentContainer, currentStory.content as Type<any>);
         this.onContentLoaded();
-        this.startProgressInterval(5000); // Default duration for components
       } else {
         console.warn('dynamicComponentContainer not available for component rendering.');
         this.onContentLoaded();
-        this.startProgressInterval(storyDuration); // Fallback to default duration
       }
     } else {
       // Handling for images
       const imageElement = document.createElement('img');
-      imageElement.crossOrigin = 'anonymous';
+      imageElement.crossOrigin = currentStory.crossOrigin === undefined ? 'anonymous' : currentStory.crossOrigin;
       imageElement.src = currentStory.content as string;
 
       // Check if the image is cached
       if (this.storyService.isImageCached(currentStory.content as string)) {
         this.onContentLoaded(); // Call immediately if cached
-        this.startProgressInterval(storyDuration); // Use default image duration
       } else {
         imageElement.onload = () => {
           this.onContentLoaded(); // Call on image load event
-          this.startProgressInterval(storyDuration); // Use default image duration
+        };
+        // Add error handling for preloading images to prevent hanging
+        imageElement.onerror = () => {
+          this.onContentError();
         };
       }
 
@@ -251,7 +259,18 @@ export class NgxStoriesComponent implements AfterViewInit {
         if (videoElement) {
           videoElement.muted = !this.isAudioEnabled;
           videoElement.play().catch(err => {
-            console.error(err);
+            console.warn('Autoplay failed, attempting to play muted:', err);
+            // If autoplay fails (likely due to unmuted blocking), try playing muted
+            videoElement.muted = true;
+            videoElement.play().then(() => {
+              // If successful, update our state to reflect it's now muted
+              this.isAudioEnabled = false;
+              this.cdr.detectChanges(); // Update UI icon
+            }).catch(mutedErr => {
+              // If it still fails, it might be low power mode or other restriction
+              console.error('Video playback failed completely:', mutedErr);
+              this.onContentError();
+            });
           });
           this.startVideoBackgroundUpdate(videoElement);
         }
@@ -435,11 +454,14 @@ export class NgxStoriesComponent implements AfterViewInit {
       const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex];
       const activeStoryContent = activeStoryContainer?.nativeElement.querySelector('.story-content.active');
       const videoElement: HTMLVideoElement | null = activeStoryContent?.querySelector('video');
-      let storyDuration = 5000;
+      let storyDuration = this.DEFAULT_STORY_DURATION;
       if (videoElement && videoElement.duration) {
         storyDuration = videoElement.duration * 1000;
       }
       this.startProgressInterval(storyDuration);
+    } else {
+      // For images and components, use the default duration or a configurable one
+      this.startProgressInterval(this.DEFAULT_STORY_DURATION);
     }
 
     setTimeout(() => {
@@ -595,6 +617,10 @@ export class NgxStoriesComponent implements AfterViewInit {
   onContentError() {
     console.error('Error loading content');
     this.isLoading = false;
+    this.isContentError = true;
+    this.cdr.detectChanges();
+    // Auto-advance after 5s even if error, so user isn't stuck
+    this.startProgressInterval(this.DEFAULT_STORY_DURATION);
   }
 
   toggleAudio() {
