@@ -57,6 +57,10 @@
         <video [src]="story.content" [style.display]="isContentError ? 'none' : 'block'"
           [attr.crossorigin]="story.crossOrigin === undefined ? 'anonymous' : story.crossOrigin"
           (waiting)="onContentBuffering()" (playing)="onContentLoaded()" (error)="onContentError()"></video>
+        <!-- Using (playing) instead of (loadedmetadata) or (loadeddata) to ensure:
+               1. Progress bar syncs with actual playback start.
+               2. Buffering state (isLoading) is cleared only when playback resumes.
+               3. Duration is guaranteed to be available because 'playing' fires after 'loadedmetadata'. -->
         } @else if(story.type === 'component') {
         <ng-container #dynamicComponentContainer></ng-container>
         }

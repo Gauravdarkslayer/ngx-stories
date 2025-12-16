@@ -59,6 +59,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   @ViewChild('dynamicComponentContainer', { read: ViewContainerRef, static: false }) dynamicComponentContainer!: ViewContainerRef;
 
   private hammerInstances: HammerManager[] = [];
+  private initTimeout: any;
 
   constructor(
     private storyService: NgxStoriesService,
@@ -88,6 +89,7 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   ngOnDestroy(): void {
     clearInterval(this.intervalId);
+    clearTimeout(this.initTimeout);
     this.stopVideoBackgroundUpdate();
     this.hammerInstances.forEach(hammer => hammer.destroy());
     this.hammerInstances = [];
@@ -97,7 +99,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.initHammer();
     // Delay startStoryProgress to avoid ExpressionChangedAfterItHasBeenCheckedError
     // and ensure ViewChildren are fully initialized for the first story.
-    setTimeout(() => {
+    this.initTimeout = setTimeout(() => {
       this.startStoryProgress();
     });
   }

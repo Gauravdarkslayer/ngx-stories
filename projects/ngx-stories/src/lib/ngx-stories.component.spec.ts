@@ -1,7 +1,7 @@
-import { ComponentFixture, fakeAsync, TestBed, tick, flush, discardPeriodicTasks } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, flush } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { NgxStoriesComponent } from './ngx-stories.component';
-import { StoryGroup, StoryType } from '../lib/interfaces/interfaces';
+import { StoryGroup } from './interfaces/interfaces';
 import { NgxStoriesService } from './ngx-stories.service';
 
 @Component({ template: '' })
