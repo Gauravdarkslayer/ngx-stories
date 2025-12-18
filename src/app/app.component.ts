@@ -30,7 +30,7 @@ export class AppComponent {
         { type: 'image', content: 'https://i.ibb.co/ZMVy3KN/pexels-rpnickson-2486168.jpg' },
         { type: 'component', content: CustomComponentComponent },
         { type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
-        { type: 'video', content: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+        { type: 'video', content: 'https://videos.pexels.com/video-files/30809324/13177170_1080_1920_30fps.mp4' },
         { type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' },
         { type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/3.jpg' }
       ]
@@ -41,7 +41,7 @@ export class AppComponent {
         { type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/4.jpg' },
         { type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/5.jpg' },
         { type: 'video', content: 'https://videos.pexels.com/video-files/28759029/12469290_1920_1080_25fps.mp4' },
-        { type: 'video', content: 'https://videos.pexels.com/video-files/28985119/12537126_1920_1080_24fps.mp4' },
+        { type: 'video', content: 'https://videos.pexels.com/video-files/29371135/12653510_2560_1440_60fps.mp4' },
         { type: 'video', content: 'https://videos.pexels.com/video-files/28496760/12399731_1440_2560_30fps.mp4' }
       ]
     },
