@@ -40,7 +40,7 @@ export class AppComponent {
       stories: [
         { type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/4.jpg' },
         { type: 'image', content: 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/5.jpg' },
-        { type: 'video', content: 'https://videos.pexels.com/video-files/28759029/12469290_1920_1080_25fps.mp4' },
+        { type: 'video', content: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
         { type: 'video', content: 'https://videos.pexels.com/video-files/29371135/12653510_2560_1440_60fps.mp4' },
         { type: 'video', content: 'https://videos.pexels.com/video-files/28496760/12399731_1440_2560_30fps.mp4' }
       ]

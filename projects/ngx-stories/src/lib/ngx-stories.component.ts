@@ -101,7 +101,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     // and ensure ViewChildren are fully initialized for the first story.
     this.initTimeout = setTimeout(() => {
       this.startStoryProgress();
-    });
+    }, 0);
   }
 
   startStoryProgress() {
@@ -125,7 +125,7 @@ export class NgxStoriesComponent implements AfterViewInit {
     } else {
       // Handling for images
       const imageElement = document.createElement('img');
-      imageElement.crossOrigin = currentStory.crossOrigin === undefined ? 'anonymous' : currentStory.crossOrigin;
+      imageElement.crossOrigin = currentStory.crossOrigin === undefined ? 'anonymous' : (currentStory.crossOrigin || null);
       imageElement.src = currentStory.content as string;
 
       // Check if the image is cached
@@ -457,7 +457,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       const activeStoryContent = activeStoryContainer?.nativeElement.querySelector('.story-content.active');
       const videoElement: HTMLVideoElement | null = activeStoryContent?.querySelector('video');
       let storyDuration = this.DEFAULT_STORY_DURATION;
-      if (videoElement && videoElement.duration) {
+      if (videoElement && isFinite(videoElement.duration) && videoElement.duration > 0) {
         storyDuration = videoElement.duration * 1000;
       }
       this.startProgressInterval(storyDuration);
@@ -627,7 +627,12 @@ export class NgxStoriesComponent implements AfterViewInit {
 
   toggleAudio() {
     this.isAudioEnabled = !this.isAudioEnabled;
-    this.storyContainers.first.nativeElement.querySelector('video').muted = !this.isAudioEnabled;
+    const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex];
+    const activeStoryContent = activeStoryContainer?.nativeElement.querySelector('.story-content.active');
+    const videoElement: HTMLVideoElement | null = activeStoryContent?.querySelector('video');
+    if (videoElement) {
+      videoElement.muted = !this.isAudioEnabled;
+    }
   }
 
   // Detect user interaction on the document level
