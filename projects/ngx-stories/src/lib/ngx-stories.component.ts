@@ -59,7 +59,7 @@ export class NgxStoriesComponent implements AfterViewInit {
   @ViewChild('dynamicComponentContainer', { read: ViewContainerRef, static: false }) dynamicComponentContainer!: ViewContainerRef;
 
   private hammerInstances: HammerManager[] = [];
-  private initTimeout: any;
+  private initTimeout: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
     private storyService: NgxStoriesService,
@@ -119,8 +119,8 @@ export class NgxStoriesComponent implements AfterViewInit {
         this.storyService.renderComponent(this.dynamicComponentContainer, currentStory.content as Type<any>);
         this.onContentLoaded();
       } else {
-        console.warn('dynamicComponentContainer not available for component rendering.');
-        this.onContentLoaded();
+        console.error('dynamicComponentContainer not available for component rendering. Cannot render component story.');
+        this.onContentError();
       }
     } else {
       // Handling for images
