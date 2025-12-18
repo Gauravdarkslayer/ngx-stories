@@ -71,10 +71,12 @@
   }
 
   <div class="progress-bar-container" [style.visibility]="isHolding ? 'hidden' : 'visible'">
-    @for(story of storyGroup.stories; track story.id; let x = $index ) {
+    @for(story of storyGroup.stories; track story.id; let x = $index; let last = $last ) {
     <progress class="progress-bar" [value]="getProgressValue(x)" max="100" [class.active]="x===currentStoryIndex">
     </progress>
+    @if(!last) {
     <div style="width: 2vw;"></div>
+    }
     }
   </div>
   @if(!(currentStoryGroupIndex === 0 && currentStoryIndex === 0) ) {
