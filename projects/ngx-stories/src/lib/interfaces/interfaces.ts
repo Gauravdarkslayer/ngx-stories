@@ -6,6 +6,7 @@ export interface Story {
     id?: string,
     type: StoryType,
     content: string | Type<Component>,
+    crossOrigin?: 'anonymous' | 'use-credentials' | '' | null;
 }
 
 export interface StoryGroup {
