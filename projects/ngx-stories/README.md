@@ -58,8 +58,8 @@ export class AppComponent {
 | `triggerOnEnd`     | `EventEmitter<void>`  | No       | Output event that is triggered when the user reaches the end of all stories.                                  |
 | `triggerOnExit`    | `EventEmitter<void>`  | No       | Output event that is triggered when the user manually exits the story view.                                   |
 | `triggerOnSwipeUp` | `EventEmitter<void>`  | No       | Output event that is triggered when the user performs a swipe-up gesture, typically for additional actions.    |
-| `onStoryGroupChange` | `EventEmitter<number>`  | No       | Output event that is triggered when the user changes the storyGroup (emits the new group index).
-| `triggerOnStoryChange` | `EventEmitter<StoryChangeEventData>`  | No       | Output event triggered when the story changes. Emits detailed information about current and previous stories.
+| `onStoryGroupChange` | `EventEmitter<number>`  | No       | Output event that is triggered when the user changes the storyGroup.
+| `triggerOnStoryChange` | `EventEmitter<object>`  | No       | Output event that is triggered when the user changes the story.
 
 
 ```ts
@@ -70,15 +70,6 @@ interface NgxStoriesOptions {
   currentStoryGroupIndex: 0, // index from where story group should start
   backlitColor: string, // background color of story default is #1b1b1b (for custom components or when gradient disabled)
   enableGradientBackground: boolean // Enable/Disable blurred gradient background (default: true)
-}
-
-interface StoryChangeEventData {
-  currentStoryGroupName: string, // name of the current story group
-  currentStoryGroupIndex: number, // index of the current story group
-  currentStory: Story, // the currently active story
-  currentStoryIndex: number, // index of the current story within its group
-  previousStory: Story | null, // the previously active story, or null if this is the first story
-  previousStoryIndex: number | null // index of the previous story, or null if this is the first story
 }
 ```
 
