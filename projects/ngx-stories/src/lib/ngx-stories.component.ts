@@ -182,9 +182,7 @@ export class NgxStoriesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     // Clear all intervals and timeouts to prevent memory leaks
-    if (this.intervalId !== null) {
-      this.clearProgressInterval();
-    }
+    this.clearProgressInterval();
     if (this.initTimeout !== undefined) {
       clearTimeout(this.initTimeout);
     }
@@ -357,6 +355,9 @@ export class NgxStoriesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (direction === 'left') {
       this.isSwipingLeft = true;
       this.cdr.detectChanges();
+      if (this.swipeTimeout !== null) {
+        clearTimeout(this.swipeTimeout);
+      }
       this.swipeTimeout = setTimeout(() => {
         if (this.currentStoryGroupIndex === this.storyGroups.length - 1) {
           let stories = this.storyGroups[this.currentStoryGroupIndex].stories;
@@ -635,8 +636,8 @@ export class NgxStoriesComponent implements OnInit, AfterViewInit, OnDestroy {
   private populateCurrentDetails(storyIndex: number, storyGroupIndex: number): void {
     try {
       const dataToSend: StoryChangeEventData = {
-        currentPerson: this.storyGroups[storyGroupIndex].name,
-        currentPersonIndex: storyGroupIndex,
+        currentStoryGroupName: this.storyGroups[storyGroupIndex].name,
+        currentStoryGroupIndex: storyGroupIndex,
         currentStory: this.storyGroups[storyGroupIndex].stories[storyIndex],
         currentStoryIndex: storyIndex,
         previousStory: storyIndex !== 0 ? this.storyGroups[storyGroupIndex].stories[storyIndex - 1] : null,

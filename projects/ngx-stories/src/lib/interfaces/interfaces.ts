@@ -99,10 +99,10 @@ export interface NgxStoriesOptions {
  */
 export interface StoryChangeEventData {
     /** Name of the current story group. */
-    currentPerson: string;
+    currentStoryGroupName: string;
 
     /** Index of the current story group. */
-    currentPersonIndex: number;
+    currentStoryGroupIndex: number;
 
     /** The currently active story. */
     currentStory: Story;

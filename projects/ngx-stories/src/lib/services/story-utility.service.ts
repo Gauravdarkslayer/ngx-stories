@@ -37,6 +37,17 @@ export class StoryUtilityService {
         onStoryGroupChange: (storyGroupIndex: number) => void
     ): { storyGroupIndex: number; storyIndex: number } {
         const stories = storyGroups[currentStoryGroupIndex]?.stories;
+
+        // Defensive guard: if stories is missing or empty, treat group as empty and advance
+        if (!stories || stories.length === 0) {
+            currentStoryGroupIndex = currentStoryGroupIndex + 1;
+            currentStoryIndex = 0;
+            if (currentStoryGroupIndex < storyGroups.length) {
+                onStoryGroupChange(currentStoryGroupIndex);
+            }
+            return { storyGroupIndex: currentStoryGroupIndex, storyIndex: currentStoryIndex };
+        }
+
         if (currentStoryIndex === stories.length - 1) {
             // Move to the next storyGroup if the current story index is the last
             currentStoryGroupIndex = currentStoryGroupIndex + 1;
@@ -68,12 +79,28 @@ export class StoryUtilityService {
         onStoryGroupChange: (storyGroupIndex: number) => void
     ): { storyGroupIndex: number; storyIndex: number } {
         let stories = storyGroups[currentStoryGroupIndex]?.stories;
+
+        // Defensive guard: if stories is missing or empty at current position
+        if (!stories || stories.length === 0) {
+            if (currentStoryGroupIndex > 0) {
+                currentStoryGroupIndex--;
+                currentStoryIndex = 0;
+                onStoryGroupChange(currentStoryGroupIndex);
+            }
+            return { storyGroupIndex: currentStoryGroupIndex, storyIndex: currentStoryIndex };
+        }
+
         if (currentStoryIndex === 0) {
             // Move to the previous storyGroup if the current story index is 0
             if (currentStoryGroupIndex > 0) {
                 currentStoryGroupIndex--;
                 stories = storyGroups[currentStoryGroupIndex]?.stories;
-                currentStoryIndex = stories.length - 1;
+                // Guard against empty stories array in previous group
+                if (!stories || stories.length === 0) {
+                    currentStoryIndex = 0;
+                } else {
+                    currentStoryIndex = stories.length - 1;
+                }
                 onStoryGroupChange(currentStoryGroupIndex);
             }
         } else {
@@ -114,15 +141,19 @@ export class StoryUtilityService {
      */
     renderComponent<T>(containerRef: ViewContainerRef, component: Type<T>): T {
         containerRef?.clear();
-        const componentRef = containerRef.createComponent(component);
-        return componentRef.instance;
+        const componentRef = containerRef?.createComponent(component);
+        return componentRef?.instance;
     }
 
     /**
      * Assigns unique IDs to story groups and stories that don't have them.
      * This ensures proper tracking in Angular's @for loops.
-     * @param storyGroups - Story groups to process
-     * @returns The same array with IDs assigned
+     * 
+     * **⚠️ MUTATES INPUT**: This method modifies the input array in place for performance.
+     * If you need the original array unchanged, pass a deep copy instead.
+     * 
+     * @param storyGroups - Story groups to process (will be mutated)
+     * @returns The same array reference with IDs assigned
      */
     assignIdsIfMissing(storyGroups: StoryGroup[]): StoryGroup[] {
         for (const storyGroup of storyGroups) {

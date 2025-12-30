@@ -31,6 +31,9 @@ export class StoryStateService {
      * Navigates to the next or previous story.
      */
     navigate(direction: 'next' | 'previous', onGroupChange: (idx: number) => void): { storyGroupIndex: number; storyIndex: number } {
+        if (this.storyGroups.length === 0) {
+            return { storyGroupIndex: this.currentStoryGroupIndex, storyIndex: this.currentStoryIndex };
+        }
         const { storyGroupIndex, storyIndex } = direction === 'next'
             ? this.storyService.nextStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, onGroupChange)
             : this.storyService.prevStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, onGroupChange);
