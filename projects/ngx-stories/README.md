@@ -74,7 +74,7 @@ export class AppComponent {
 | `triggerOnExit` | `void` | Emitted when the user triggers an exit action (e.g., swipe down). |
 | `triggerOnSwipeUp` | `void` | Emitted when the user swipes up on a story. |
 | `onStoryGroupChange` | `number` | Emitted when the story group changes. Payload is the new group index. |
-| `triggerOnStoryChange` | `StoryChange` | Emitted when the individual story changes. see `StoryChange` interface below. |
+| `triggerOnStoryChange` | `StoryChangeEventData` | Emitted when the individual story changes. see `StoryChangeEventData` interface below. |
 
 ### Interfaces
 
@@ -108,11 +108,11 @@ interface NgxStoriesOptions {
 }
 ```
 
-#### `StoryChange` (Payload for `triggerOnStoryChange`)
+#### `StoryChangeEventData` (Payload for `triggerOnStoryChange`)
 ```ts
-interface StoryChange {
-  currentPerson: string;
-  currentPersonIndex: number;
+interface StoryChangeEventData {
+  currentStoryGroupName: string;
+  currentStoryGroupIndex: number;
   currentStory: Story;
   currentStoryIndex: number;
   previousStory: Story | null;
