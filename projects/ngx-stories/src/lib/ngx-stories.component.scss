@@ -1,10 +1,8 @@
 .story-container {
   position: relative;
-  // overflow: hidden;
   border-radius: 10px;
   opacity: 0;
   display: none;
-  position: relative;
   transition: transform 0.6s ease-in-out;
   max-width: 100%;
   max-height: 100%;
@@ -35,7 +33,6 @@
 
 .progress-bar {
   height: 3px;
-  background-color: rgba(255, 255, 255, 0.5);
   width: 100%;
   background-color: rgba(128, 128, 128, 0.705);
   border-radius: 5px;
@@ -117,7 +114,15 @@ button:hover {
   position: absolute;
   transform: translateY(-50%);
   height: 100vh;
+  width: 33%;
+  z-index: 20;
+  /* Ensure it is above other elements */
 }
+
+.prev {
+  left: 0;
+}
+
 
 .next {
   right: 1%;
@@ -240,13 +245,6 @@ button:hover {
   }
 }
 
-// Navigation visible for desktop only
-@media (min-width: 1024px) {
-  .desktop-navigation {
-    visibility: visible;
-    pointer-events: all;
-  }
-}
 
 /* Apply to all screen sizes (mobile first) */
 .story-content-container {
@@ -309,5 +307,13 @@ button:hover {
     .video-audio-icon.audio-disabled {
       background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>');
     }
+  }
+}
+
+// Navigation visible for desktop only
+@media (min-width: 1024px) {
+  .desktop-navigation {
+    visibility: visible;
+    pointer-events: all;
   }
 }

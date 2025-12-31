@@ -1,7 +1,7 @@
 @for(storyGroup of storyGroups; track storyGroup.id; let i=$index) {
 <div class="story-container" #storyContainer [class.active]="i === currentStoryGroupIndex"
-  [class.swipe-left]="isSwipingLeft" [class.swipe-right]="isSwipingRight" (mousedown)="onTouchStart()"
-  (mouseup)="onRelease()" (touchstart)="onTouchStart()" (touchend)="onRelease()"
+  [class.swipe-left]="isSwipingLeft" [class.swipe-right]="isSwipingRight" (mousedown)="onTouchStart($event)"
+  (mouseup)="onRelease($event)" (touchstart)="onTouchStart($event)" (touchend)="onRelease($event)"
   (contextmenu)="disableContextMenu($event)">
   @for(story of storyGroup.stories; track story.id; let z = $index ) {
   @if (z === currentStoryIndex) {
@@ -23,7 +23,8 @@
       </div>
     </div>
     <!-- Loading spinner -->
-    <div *ngIf="isLoading" class="loading-spinner">
+    @if (isLoading) {
+    <div class="loading-spinner">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="50" height="50">
         <radialGradient id="a12" cx=".66" fx=".66" cy=".3125" fy=".3125" gradientTransform="scale(1.5)">
           <stop offset="0" stop-color="#FFFFFF"></stop>
@@ -41,6 +42,7 @@
           stroke-linecap="round" cx="100" cy="100" r="70"></circle>
       </svg>
     </div>
+    }
     <div class="story-main-content-container">
       <div [style.background]="currentStoryBackground" class="story-style"
         [class.blurred-bg]="story.type !== 'component' && options.enableGradientBackground">

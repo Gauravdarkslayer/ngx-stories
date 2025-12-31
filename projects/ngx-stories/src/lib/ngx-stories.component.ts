@@ -1,52 +1,90 @@
-import { AfterViewInit, Component, ElementRef, Input, Output, QueryList, ViewChildren, HostListener, ViewChild, ViewContainerRef, Type, ChangeDetectorRef } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { HammerModule } from '@angular/platform-browser';
-import { StoryGroup, StoryStateType } from '../lib/interfaces/interfaces';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  Output,
+  QueryList,
+  Type,
+  ViewChild,
+  ViewChildren,
+  ViewContainerRef
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgxStoriesService } from './ngx-stories.service';
-import { NgxStoriesOptions } from '../lib/interfaces/interfaces';
-import { onStoryGroupChange, triggerOnEnd, triggerOnExit, triggerOnStoryChange, triggerOnSwipeUp } from './utils/story-event-emitters';
-import "hammerjs";
-import { options as ngxStoriesOptions } from './utils/default-options';
+import { StoryUtilityService } from './services/story-utility.service';
+import { StoryStateService } from './services/story-state.service';
+import { StoryVideoService } from './services/story-video.service';
+import { StoryGroup, StoryStateType, NgxStoriesOptions, StoryChangeEventData } from './interfaces/interfaces';
+import { DEFAULT_STORIES_OPTIONS } from './utils/default-options';
 
 @Component({
   selector: 'ngx-stories',
   standalone: true,
-  imports: [RouterOutlet, HammerModule, CommonModule],
+  imports: [CommonModule],
+  providers: [StoryUtilityService, StoryStateService, StoryVideoService],
   templateUrl: './ngx-stories.component.html',
   styleUrl: './ngx-stories.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NgxStoriesComponent implements AfterViewInit {
+export class NgxStoriesComponent implements OnInit, AfterViewInit, OnDestroy {
   title = 'ngx-stories';
 
   // Input property to accept the list of storyGroup and their stories
   @Input({ required: true }) storyGroups: StoryGroup[] = [];
 
-  // options
-  @Input() options: NgxStoriesOptions = {};
+  /** Emitted when all stories in all groups have been viewed. */
+  @Output() readonly triggerOnEnd = new EventEmitter<void>();
 
-  // Output events to handle end of stories, exit, and swipe-up gesture
-  @Output() triggerOnEnd = triggerOnEnd;
-  @Output() triggerOnExit = triggerOnExit;
-  @Output() triggerOnSwipeUp = triggerOnSwipeUp;
-  @Output() onStoryGroupChange = onStoryGroupChange;
-  @Output() triggerOnStoryChange = triggerOnStoryChange;
+  /** Emitted when the user exits the stories (swipe down or Escape key). */
+  @Output() readonly triggerOnExit = new EventEmitter<void>();
 
-  currentStoryIndex: number = 0;
-  currentStoryGroupIndex: number = 0;
-  progressWidth: number = 0;
-  intervalId: any; // Interval for story progress
-  isTransitioning = false; // Prevents multiple transitions at once
+  /** Emitted when the user swipes up on a story. */
+  @Output() readonly triggerOnSwipeUp = new EventEmitter<void>();
+
+  /** Emitted when the active story group changes. Payload is the new group index. */
+  @Output() readonly onStoryGroupChange = new EventEmitter<number>();
+
+  /** Emitted when the active story changes within a group. */
+  @Output() readonly triggerOnStoryChange = new EventEmitter<StoryChangeEventData>();
+
+  progressWidth = 0;
+  isTransitioning = false;
   isSwipingLeft = false;
   isSwipingRight = false;
   isHolding = false;
-  holdTimeout: any; // Timeout for holding the story (pause functionality)
-  storyState: StoryStateType = 'playing';
-  isLoading: boolean = false;
-  isContentError: boolean = false;
-  currentProgressWidth: number = 0;
-  isAudioEnabled: boolean = false;
-  userInteracted: boolean = false;
+  isLoading = false;
+  isContentError = false;
+
+  /** Reference to the interval for story progress. */
+  private intervalId: ReturnType<typeof setInterval> | null = null;
+  /** Reference to the timeout for long-press (hold) detection. */
+  private holdTimeout: ReturnType<typeof setTimeout> | null = null;
+  /** Reference to the timeout for automatically skipping a story after an error. */
+  private errorTimeout: ReturnType<typeof setTimeout> | null = null;
+  /** Reference to the timeout for swipe animations. */
+  private swipeTimeout: ReturnType<typeof setTimeout> | null = null;
+  /** Set of all tracked timeouts for transitions and animations. */
+  private transitionTimeouts: Set<ReturnType<typeof setTimeout>> = new Set();
+
+  get currentStoryIndex() { return this.stateService.currentStoryIndex; }
+  set currentStoryIndex(val: number) { this.stateService.currentStoryIndex = val; }
+  get currentStoryGroupIndex() { return this.stateService.currentStoryGroupIndex; }
+  set currentStoryGroupIndex(val: number) { this.stateService.currentStoryGroupIndex = val; }
+  get storyState() { return this.stateService.storyState; }
+  set storyState(val: StoryStateType) { this.stateService.storyState = val; }
+  get isAudioEnabled() { return this.videoService.isAudioEnabled; }
+  set isAudioEnabled(val: boolean) { this.videoService.isAudioEnabled = val; }
+
+  @Input()
+  get options(): NgxStoriesOptions { return this.stateService.options; }
+  set options(val: NgxStoriesOptions) { this.stateService.options = val; }
   // constants
   readonly HOLD_DELAY_MS = 500;
   readonly PROGRESS_INTERVAL_MS = 50;
@@ -58,24 +96,79 @@ export class NgxStoriesComponent implements AfterViewInit {
   // Add a ViewContainerRef to inject dynamic components
   @ViewChild('dynamicComponentContainer', { read: ViewContainerRef, static: false }) dynamicComponentContainer!: ViewContainerRef;
 
-  private hammerInstances: HammerManager[] = [];
+  private touchStartX = 0;
+  private touchStartY = 0;
   private initTimeout: ReturnType<typeof setTimeout> | undefined;
 
+  private videoFrameId: number | null = null;
+  private canvas: HTMLCanvasElement | null = null;
+  private context: CanvasRenderingContext2D | null = null;
+
+  // Store current and target colors for interpolation
+  private currentColors: number[][] = [[0, 0, 0], [0, 0, 0]];
+  private targetColors: number[][] = [[0, 0, 0], [0, 0, 0]];
+
+  currentStoryBackground: string = 'black';
   constructor(
-    private storyService: NgxStoriesService,
-    private cdr: ChangeDetectorRef
+    private storyUtilityService: StoryUtilityService,
+    private stateService: StoryStateService,
+    private videoService: StoryVideoService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) { }
 
+  /** Safely clears the progress interval and resets to null. */
+  private clearProgressInterval(): void {
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+  }
+
+  /** Safely clears the hold timeout and resets to null. */
+  private clearHoldTimeout(): void {
+    if (this.holdTimeout !== null) {
+      clearTimeout(this.holdTimeout);
+      this.holdTimeout = null;
+    }
+  }
+
+  /** Safely clears the error timeout and resets to null. */
+  private clearErrorTimeout(): void {
+    if (this.errorTimeout !== null) {
+      clearTimeout(this.errorTimeout);
+      this.errorTimeout = null;
+    }
+  }
+
+  /**
+   * Creates a tracked timeout that will be automatically cleaned up on component destroy.
+   * @param callback The function to execute after the delay.
+   * @param delay The delay in milliseconds.
+   * @returns The timeout ID.
+   */
+  private createTrackedTimeout(callback: () => void, delay: number): ReturnType<typeof setTimeout> {
+    const timeoutId = setTimeout(() => {
+      this.transitionTimeouts.delete(timeoutId);
+      callback();
+    }, delay);
+    this.transitionTimeouts.add(timeoutId);
+    return timeoutId;
+  }
 
   //Use Keyboard Navigations to control the stories
+  /**
+   * Handles keyboard events for story navigation and control.
+   * @param event The keyboard event.
+   */
   @HostListener('document:keydown', ['$event'])
   handleKeyPress(event: KeyboardEvent): void {
     if (event.key === 'ArrowRight') {
-      this.navigateStory('next'); // Move to the next story
+      this.navigateStory('next');
     } else if (event.key === 'ArrowLeft') {
-      this.navigateStory('previous'); // Move to the previous story
+      this.navigateStory('previous');
     } else if (event.key === ' ') {
-      event.preventDefault();
+      event.preventDefault(); // Prevent page scrolling
       this.togglePause();
     } else if (event.key === 'Escape') {
       this.onExit();
@@ -83,20 +176,36 @@ export class NgxStoriesComponent implements AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.setStoryOptions();
-    this.storyGroups = this.storyService.assignIdsIfMissing(this.storyGroups);
+    this.validateInputs();
+    this.stateService.initialize(this.storyGroups, this.options);
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.intervalId);
-    clearTimeout(this.initTimeout);
+    // Clear all intervals and timeouts to prevent memory leaks
+    this.clearProgressInterval();
+    if (this.initTimeout !== undefined) {
+      clearTimeout(this.initTimeout);
+    }
+    if (this.holdTimeout !== null) {
+      this.clearHoldTimeout();
+    }
+    this.clearErrorTimeout();
+
+    // Clear swipe timeout
+    if (this.swipeTimeout !== null) {
+      clearTimeout(this.swipeTimeout);
+      this.swipeTimeout = null;
+    }
+
+    // Clear all tracked transition timeouts
+    this.transitionTimeouts.forEach(timeout => clearTimeout(timeout));
+    this.transitionTimeouts.clear();
+
     this.stopVideoBackgroundUpdate();
-    this.hammerInstances.forEach(hammer => hammer.destroy());
-    this.hammerInstances = [];
   }
 
   ngAfterViewInit(): void {
-    this.initHammer();
+    this.storyUtilityService.setOptions(this.options, this.storyContainers);
     // Delay startStoryProgress to avoid ExpressionChangedAfterItHasBeenCheckedError
     // and ensure ViewChildren are fully initialized for the first story.
     this.initTimeout = setTimeout(() => {
@@ -107,7 +216,22 @@ export class NgxStoriesComponent implements AfterViewInit {
   startStoryProgress() {
     this.isContentError = false;
     this.onContentBuffering(); // Set loading to true initially
-    const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
+
+    // Validate story group and story exist before accessing
+    const storyGroup = this.storyGroups[this.currentStoryGroupIndex];
+    if (!storyGroup || !storyGroup.stories) {
+      console.error('ngx-stories: Invalid story group index in startStoryProgress', this.currentStoryGroupIndex);
+      this.onContentError();
+      return;
+    }
+
+    const currentStory = storyGroup.stories[this.currentStoryIndex];
+    if (!currentStory) {
+      console.error('ngx-stories: Invalid story index in startStoryProgress', this.currentStoryIndex);
+      this.onContentError();
+      return;
+    }
+
     if (currentStory.type === 'video') {
       // Video loading is handled by the template events (loadeddata, playing)
       // which call onContentLoaded()
@@ -116,7 +240,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       // based on the current index before we try to access it.
       this.cdr.detectChanges();
       if (this.dynamicComponentContainer) {
-        this.storyService.renderComponent(this.dynamicComponentContainer, currentStory.content as Type<any>);
+        this.storyUtilityService.renderComponent(this.dynamicComponentContainer, currentStory.content as Type<any>);
         this.onContentLoaded();
       } else {
         console.error('dynamicComponentContainer not available for component rendering. Cannot render component story.');
@@ -129,7 +253,7 @@ export class NgxStoriesComponent implements AfterViewInit {
       imageElement.src = currentStory.content as string;
 
       // Check if the image is cached
-      if (this.storyService.isImageCached(currentStory.content as string)) {
+      if (this.storyUtilityService.isImageCached(currentStory.content as string)) {
         this.onContentLoaded(); // Call immediately if cached
       } else {
         imageElement.onload = () => {
@@ -145,67 +269,115 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.populateCurrentDetails(this.currentStoryIndex, this.currentStoryGroupIndex)
   }
 
-  private setStoryOptions() {
-    this.options = {
-      ...ngxStoriesOptions,
-      ...this.options
-    };
+  /**
+   * Validates required inputs and throws meaningful errors for invalid configuration.
+   */
+  private validateInputs(): void {
+    if (!this.storyGroups || this.storyGroups.length === 0) {
+      throw new Error('ngx-stories: storyGroups input is required and must contain at least one group.');
+    }
 
-    // Set the index for the story view to start with.
-    this.currentStoryIndex = this.options.currentStoryIndex as number;
-    this.currentStoryGroupIndex = this.options.currentStoryGroupIndex as number;
+    for (const group of this.storyGroups) {
+      if (!group.stories || group.stories.length === 0) {
+        throw new Error(`ngx-stories: Story group "${group.name}" must contain at least one story.`);
+      }
+
+      for (const story of group.stories) {
+        if (story.type === 'component' && typeof story.content === 'string') {
+          throw new Error(
+            `ngx-stories: Story with type "component" must have a component class as content, not a string.`
+          );
+        }
+        if ((story.type === 'image' || story.type === 'video') && typeof story.content !== 'string') {
+          throw new Error(
+            `ngx-stories: Story with type "${story.type}" must have a URL string as content.`
+          );
+        }
+      }
+    }
   }
 
   startProgressInterval(storyDuration: number) {
     const progressPerTick = this.FULL_PROGRESS_WIDTH / (storyDuration / this.PROGRESS_INTERVAL_MS);
 
-    clearInterval(this.intervalId);
+    this.clearProgressInterval();
 
-    this.intervalId = this.storyService.startProgress(this.PROGRESS_INTERVAL_MS, () => {
-      if (!this.isLoading) {
-        // Don't increase the progress width if the story is loading
-        this.progressWidth += progressPerTick;
-      }
-      if (this.progressWidth >= this.FULL_PROGRESS_WIDTH) {
-        clearInterval(this.intervalId);
-        this.navigateStory('next');
-      }
+    this.ngZone.runOutsideAngular(() => {
+      this.intervalId = this.storyUtilityService.startProgress(this.PROGRESS_INTERVAL_MS, () => {
+        if (!this.isLoading) {
+          // Don't increase the progress width if the story is loading
+          this.progressWidth += progressPerTick;
+          // With OnPush strategy, we need explicit detectChanges even inside ngZone.run
+          this.ngZone.run(() => {
+            this.cdr.detectChanges();
+          });
+        }
+        if (this.progressWidth >= this.FULL_PROGRESS_WIDTH) {
+          this.clearProgressInterval();
+          this.ngZone.run(() => {
+            this.navigateStory('next');
+          });
+        }
+      });
     });
   }
 
-  private initHammer() {
-    this.storyContainers?.forEach(storyContainer => {
-      const hammer = new Hammer(storyContainer.nativeElement);
-      hammer.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
-      hammer.on('swipeleft', () => this.handleSwipe('left'));
-      hammer.on('swiperight', () => this.handleSwipe('right'));
-      hammer.on('swipedown', () => this.handleSwipe('down'));
-      hammer.on('swipeup', () => this.handleSwipe('up'));
-      this.hammerInstances.push(hammer);
-    });
-    this.storyService.setOptions(this.options, this.storyContainers);
+  private detectSwipe(startX: number, startY: number, endX: number, endY: number) {
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    // Minimum distance for a swipe to be recognized
+    const threshold = 50;
+
+    if (Math.max(absX, absY) > threshold) {
+      if (absX > absY) {
+        // Horizontal swipe
+        if (deltaX > 0) {
+          this.handleSwipe('right');
+        } else {
+          this.handleSwipe('left');
+        }
+      } else {
+        // Vertical swipe
+        if (deltaY > 0) {
+          this.handleSwipe('down');
+        } else {
+          this.handleSwipe('up');
+        }
+      }
+    }
   }
+
 
   private handleSwipe(direction: string) {
     if (direction === 'left') {
       this.isSwipingLeft = true;
-      setTimeout(() => {
+      this.cdr.detectChanges();
+      if (this.swipeTimeout !== null) {
+        clearTimeout(this.swipeTimeout);
+      }
+      this.swipeTimeout = setTimeout(() => {
         if (this.currentStoryGroupIndex === this.storyGroups.length - 1) {
-          let stories = this.storyGroups.find((storyGroup, index) => index === this.currentStoryGroupIndex)?.stories;
-          this.currentStoryIndex = Number(stories?.length) - 1;
+          let stories = this.storyGroups[this.currentStoryGroupIndex].stories;
+          this.currentStoryIndex = stories.length - 1;
           if (this.hasReachedEndOfStories()) return;
         }
         this.goToNextStoryGroup();
         this.resetSwipe();
+        this.swipeTimeout = null;
       }, 600); // Match the animation duration
     } else if (direction === 'right') {
       this.isSwipingRight = true;
-      setTimeout(() => {
+      this.cdr.detectChanges();
+      this.swipeTimeout = setTimeout(() => {
         this.goToPreviousStoryGroup();
         this.resetSwipe();
+        this.swipeTimeout = null;
       }, 600); // Match the animation duration
     } else if (direction === 'down') {
-      clearInterval(this.intervalId);
+      this.clearProgressInterval();
       this.onExit();
     } else if (direction === 'up') {
       this.onSwipeUpTriggered();
@@ -215,18 +387,17 @@ export class NgxStoriesComponent implements AfterViewInit {
   private resetSwipe() {
     this.isSwipingLeft = false;
     this.isSwipingRight = false;
+    this.cdr.detectChanges();
   }
 
   navigateStory(direction: 'next' | 'previous') {
     if (this.isTransitioning) return;
     this.pauseCurrentVideo(true);  // Pause the video before navigating
     this.setTransitionState(true);
-    clearInterval(this.intervalId);
+    this.clearProgressInterval();
+    this.clearErrorTimeout();
 
-    const { storyGroupIndex, storyIndex } =
-      direction === 'next'
-        ? this.storyService.nextStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, this.storyGroupChange.bind(this))
-        : this.storyService.prevStory(this.storyGroups, this.currentStoryGroupIndex, this.currentStoryIndex, this.storyGroupChange.bind(this));
+    const { storyGroupIndex, storyIndex } = this.stateService.navigate(direction, this.storyGroupChange.bind(this));
 
     this.currentStoryGroupIndex = storyGroupIndex;
     this.currentStoryIndex = storyIndex;
@@ -241,65 +412,52 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.progressWidth = 0;
     this.setTransitionState(false, this.HOLD_DELAY_MS);
 
+    // Always initialize story content (render components, prepare images)
+    // regardless of play/pause state to prevent black screens.
+    this.startStoryProgress();
+
     if (this.storyState !== 'paused') {
       this.storyState = 'playing';
-      this.startStoryProgress();
+      // startStoryProgress will be called and cdr.detectChanges() will be triggered there
+      // but we need to update view for empty ProgressWidth and new story index immediately
+      this.cdr.detectChanges();
       this.playCurrentStoryVideo();
+    } else {
+      this.cdr.detectChanges();
     }
   }
 
   private playCurrentStoryVideo() {
-    setTimeout(() => {
-      const currentStory = this.storyGroups.find((storyGroup, index) => index === this.currentStoryGroupIndex)?.stories[this.currentStoryIndex];
+    this.createTrackedTimeout(() => {
+      const currentStory = this.stateService.getCurrentStory();
 
-      // If the current story is a video, find the video element and play it
       if (currentStory?.type === 'video') {
-        const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex]; // Current story group container
-        const activeStoryContent = activeStoryContainer.nativeElement.querySelector('.story-content.active'); // Active story within the group
-        const videoElement: HTMLVideoElement | null = activeStoryContent.querySelector('video');
-
+        const videoElement = this.videoService.getActiveVideoElement(this.storyContainers, this.currentStoryGroupIndex);
+        this.videoService.playVideoWithRetry(
+          videoElement,
+          () => this.cdr.detectChanges(), // Fallback (muted)
+          () => this.onContentError()     // Error
+        );
         if (videoElement) {
-          videoElement.muted = !this.isAudioEnabled;
-          videoElement.play().catch(err => {
-            console.warn('Autoplay failed, attempting to play muted:', err);
-            // If autoplay fails (likely due to unmuted blocking), try playing muted
-            videoElement.muted = true;
-            videoElement.play().then(() => {
-              // If successful, update our state to reflect it's now muted
-              this.isAudioEnabled = false;
-              this.cdr.detectChanges(); // Update UI icon
-            }).catch(mutedErr => {
-              // If it still fails, it might be low power mode or other restriction
-              console.error('Video playback failed completely:', mutedErr);
-              this.onContentError();
-            });
-          });
           this.startVideoBackgroundUpdate(videoElement);
         }
       }
     }, 0);
-
   }
 
   private pauseCurrentVideo(seek: null | boolean = null) {
     this.stopVideoBackgroundUpdate();
-    // Pause all videos in all story containers
-    this.storyContainers?.forEach(container => {
-      const videos = container.nativeElement.querySelectorAll('video');
-      videos.forEach((video: HTMLVideoElement) => {
-        video.pause();
-        if (seek) video.currentTime = 0;
-      });
-    });
+    this.videoService.pauseAllVideos(this.storyContainers, !!seek);
+    // No need for detectChanges here - no view state changes that require immediate update
   }
 
   private resetBackground() {
     const defaultColor = this.options.backlitColor || '#1b1b1b';
     this.currentStoryBackground = defaultColor;
-    const parsedRef = this.storyService.parseColor(defaultColor);
+    const parsedRef = this.storyUtilityService.parseColor(defaultColor);
     this.currentColors = [[...parsedRef], [...parsedRef]];
     this.targetColors = [[...parsedRef], [...parsedRef]];
-    this.cdr.detectChanges();
+    // Caller will handle change detection
   }
 
   private goToNextStoryGroup() {
@@ -310,12 +468,15 @@ export class NgxStoriesComponent implements AfterViewInit {
     if (this.hasReachedEndOfStories()) return;
     this.currentStoryIndex = 0;
     this.resetBackground();
-    clearInterval(this.intervalId);
+    this.clearProgressInterval();
+    this.clearErrorTimeout();
     this.progressWidth = 0;
     this.storyGroupChange();
-    setTimeout(() => {
+    this.cdr.detectChanges(); // Update view for transition state
+    this.createTrackedTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
+      this.cdr.detectChanges();
     }, this.HOLD_DELAY_MS); // Match this timeout with the CSS transition duration
   }
 
@@ -325,22 +486,27 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.isTransitioning = true;
     this.currentStoryIndex = 0;
     this.resetBackground();
-    clearInterval(this.intervalId);
+    this.clearProgressInterval();
+    this.clearErrorTimeout();
     if (this.currentStoryGroupIndex !== 0 && this.storyGroups.length > this.currentStoryGroupIndex) {
       this.currentStoryGroupIndex--;
     }
     this.progressWidth = 0;
     this.storyGroupChange();
-    setTimeout(() => {
+    this.cdr.detectChanges(); // Update view
+    this.createTrackedTimeout(() => {
       this.startStoryProgress();
       this.isTransitioning = false;
+      this.cdr.detectChanges();
     }, this.HOLD_DELAY_MS); // Match this timeout with the CSS transition duration
   }
 
   private setTransitionState(isTransitioning: boolean, duration = this.HOLD_DELAY_MS): void {
     this.isTransitioning = isTransitioning;
-    setTimeout(() => {
+    this.cdr.detectChanges();
+    this.createTrackedTimeout(() => {
       this.isTransitioning = false;
+      this.cdr.detectChanges();
     }, duration); // Ensure consistent transition timing
   }
 
@@ -364,7 +530,14 @@ export class NgxStoriesComponent implements AfterViewInit {
     }
   }
 
-  onTouchStart() {
+  onTouchStart(event: TouchEvent | MouseEvent) {
+    if (event instanceof TouchEvent) {
+      this.touchStartX = event.touches[0].clientX;
+      this.touchStartY = event.touches[0].clientY;
+    } else {
+      this.touchStartX = (event as MouseEvent).clientX;
+      this.touchStartY = (event as MouseEvent).clientY;
+    }
     this.holdTimeout = setTimeout(() => {
       this.onHold();
     }, this.HOLD_DELAY_MS);
@@ -374,17 +547,32 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.isHolding = true;
     this.storyState = 'paused';
     this.pauseCurrentVideo();  // Pause the video when holding
-    clearInterval(this.intervalId);
+    this.clearProgressInterval();
+    this.cdr.detectChanges();
   }
 
-  onRelease() {
-    clearTimeout(this.holdTimeout);  // Cancel hold if user releases before 1 second
+  onRelease(event: TouchEvent | MouseEvent) {
+    this.clearHoldTimeout();  // Cancel hold if user releases before 1 second
     if (this.isHolding) {
       this.isHolding = false;
       this.storyState = 'playing';
       this.startStoryProgress();
       this.playCurrentStoryVideo();  // Resume the video when released
+    } else {
+      let touchEndX: number;
+      let touchEndY: number;
+
+      if (event instanceof TouchEvent) {
+        touchEndX = event.changedTouches[0].clientX;
+        touchEndY = event.changedTouches[0].clientY;
+      } else {
+        touchEndX = (event as MouseEvent).clientX;
+        touchEndY = (event as MouseEvent).clientY;
+      }
+
+      this.detectSwipe(this.touchStartX, this.touchStartY, touchEndX, touchEndY);
     }
+    this.cdr.detectChanges();
   }
 
   disableContextMenu(event: MouseEvent) {
@@ -394,12 +582,38 @@ export class NgxStoriesComponent implements AfterViewInit {
   togglePause() {
     this.storyState = this.storyState === 'paused' ? 'playing' : 'paused';
     if (this.storyState === 'paused') {
-      clearInterval(this.intervalId);
+      this.clearProgressInterval();
       this.pauseCurrentVideo();
     } else {
       this.startStoryProgress();
       this.playCurrentStoryVideo();  // Resume the video when released
     }
+    this.cdr.detectChanges();
+  }
+
+  toggleAudio() {
+    const videoElement = this.videoService.getActiveVideoElement(this.storyContainers, this.currentStoryGroupIndex);
+    this.videoService.toggleAudio(videoElement);
+    this.cdr.detectChanges();
+  }
+
+  onContentBuffering() {
+    this.isLoading = true;
+    this.cdr.detectChanges();
+  }
+
+  onContentError() {
+    this.isLoading = false;
+    this.isContentError = true;
+    this.cdr.detectChanges();
+    // Auto advance after 3 seconds
+    this.ngZone.runOutsideAngular(() => {
+      this.errorTimeout = setTimeout(() => {
+        this.ngZone.run(() => {
+          this.navigateStory('next');
+        });
+      }, 3000);
+    });
   }
 
   private onEnd() {
@@ -419,38 +633,41 @@ export class NgxStoriesComponent implements AfterViewInit {
     this.onStoryGroupChange.emit(storyGroupIndex);
   }
 
-  private populateCurrentDetails(currentSIndex: number, currentSGIndex: number) {
+  private populateCurrentDetails(storyIndex: number, storyGroupIndex: number): void {
     try {
-      const dataToSend = {
-        currentPerson: this.storyGroups[currentSGIndex].name,
-        currentPersonIndex: currentSGIndex,
-        currentStory: this.storyGroups[currentSGIndex].stories[currentSIndex],
-        currentStoryIndex: currentSIndex,
-        previousStory: currentSIndex !== 0 ? this.storyGroups[currentSGIndex].stories[currentSIndex - 1] : null,
-        previousStoryIndex: currentSIndex !== 0 ? currentSIndex : null
-      }
+      const dataToSend: StoryChangeEventData = {
+        currentStoryGroupName: this.storyGroups[storyGroupIndex].name,
+        currentStoryGroupIndex: storyGroupIndex,
+        currentStory: this.storyGroups[storyGroupIndex].stories[storyIndex],
+        currentStoryIndex: storyIndex,
+        previousStory: storyIndex !== 0 ? this.storyGroups[storyGroupIndex].stories[storyIndex - 1] : null,
+        previousStoryIndex: storyIndex !== 0 ? storyIndex - 1 : null
+      };
       this.triggerOnStoryChange.emit(dataToSend);
     } catch (error) {
-      console.error(error);
+      console.error('ngx-stories: Failed to emit story change event:', error);
     }
   }
-
-  private videoFrameId: any;
-  private canvas: HTMLCanvasElement | null = null;
-  private context: CanvasRenderingContext2D | null = null;
-
-  // Store current and target colors for interpolation
-  private currentColors: number[][] = [[0, 0, 0], [0, 0, 0]];
-  private targetColors: number[][] = [[0, 0, 0], [0, 0, 0]];
-
-  currentStoryBackground: string = 'black';
-
-  // ...
 
   // When content (image or video) has loaded
   onContentLoaded() {
     this.isLoading = false;
-    const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
+    this.isContentError = false;
+
+    // Validate story group and story exist before accessing
+    const storyGroup = this.storyGroups[this.currentStoryGroupIndex];
+    if (!storyGroup || !storyGroup.stories) {
+      console.error('ngx-stories: Invalid story group index', this.currentStoryGroupIndex);
+      this.onContentError();
+      return;
+    }
+
+    const currentStory = storyGroup.stories[this.currentStoryIndex];
+    if (!currentStory) {
+      console.error('ngx-stories: Invalid story index', this.currentStoryIndex);
+      this.onContentError();
+      return;
+    }
 
     if (currentStory.type === 'video') {
       const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex];
@@ -460,93 +677,143 @@ export class NgxStoriesComponent implements AfterViewInit {
       if (videoElement && isFinite(videoElement.duration) && videoElement.duration > 0) {
         storyDuration = videoElement.duration * 1000;
       }
-      this.startProgressInterval(storyDuration);
+      if (this.storyState === 'playing') {
+        this.startProgressInterval(storyDuration);
+      }
     } else {
       // For images and components, use the default duration or a configurable one
-      this.startProgressInterval(this.DEFAULT_STORY_DURATION);
+      if (this.storyState === 'playing') {
+        this.startProgressInterval(this.DEFAULT_STORY_DURATION);
+      }
     }
 
-    setTimeout(() => {
+    this.createTrackedTimeout(() => {
       // For images, we can update immediately or animate. 
       // Let's just update immediately for now, or let the loop handle it if it's a video.
       this.updateBackground();
+      this.cdr.detectChanges();
     }, 0);
+    this.cdr.detectChanges();
   }
 
-  updateBackground() {
+  updateBackground(existingMediaElement?: HTMLImageElement | HTMLVideoElement) {
     if (!this.storyContainers) return;
     const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex];
     if (!activeStoryContainer) return;
 
-    // Check if current story is a component or if gradient background is disabled
-    const currentStory = this.storyGroups[this.currentStoryGroupIndex].stories[this.currentStoryIndex];
-    if (currentStory.type === 'component' || !this.options.enableGradientBackground) {
-      this.currentStoryBackground = this.options.backlitColor || '#1b1b1b';
+    // Validate story group and story exist before accessing
+    const storyGroup = this.storyGroups[this.currentStoryGroupIndex];
+    if (!storyGroup || !storyGroup.stories) {
+      console.error('ngx-stories: Invalid story group index in updateBackground', this.currentStoryGroupIndex);
       return;
     }
 
-    const activeStoryContent = activeStoryContainer.nativeElement.querySelector('.story-content.active');
-    if (!activeStoryContent) return;
+    const currentStory = storyGroup.stories[this.currentStoryIndex];
+    if (!currentStory) {
+      console.error('ngx-stories: Invalid story index in updateBackground', this.currentStoryIndex);
+      return;
+    }
 
-    const mediaElement = activeStoryContent.querySelector('img, video');
+    // Check if current story is a component or if gradient background is disabled
+    if (currentStory.type === 'component' || !this.options.enableGradientBackground) {
+      this.currentStoryBackground = this.options.backlitColor || '#1b1b1b';
+      // If called from a loop outside angular, we need to update style explicitly if we want to avoid detectChanges
+      // safely update the DOM node if we can find it
+      const backgroundEl = activeStoryContainer.nativeElement.querySelector('.story-style');
+      if (backgroundEl) {
+        backgroundEl.style.background = this.currentStoryBackground;
+      }
+      return;
+    }
+
+    // Optimization: use passed MediaElement if available to avoid querySelector
+    let mediaElement = existingMediaElement;
+    if (!mediaElement) {
+      const activeStoryContent = activeStoryContainer.nativeElement.querySelector('.story-content.active');
+      if (!activeStoryContent) return;
+      mediaElement = activeStoryContent.querySelector('img, video');
+    }
+
     if (mediaElement) {
       try {
-        const hexOrRgbColors = this.getDominantColors(mediaElement);
+        const hexOrRgbColors = this.getDominantColors(mediaElement as HTMLImageElement | HTMLVideoElement);
         // Parse returned colors to RGB arrays for interpolation
-        this.targetColors = hexOrRgbColors.map(c => this.storyService.parseColor(c));
+        this.targetColors = hexOrRgbColors.map(c => this.storyUtilityService.parseColor(c));
 
         // If it's an image (not video loop), we might want to snap or animate once.
         // But since updateBackground is called once for images, we can just apply it.
         if (mediaElement.tagName.toLowerCase() === 'img') {
           this.currentColors = this.targetColors;
-          this.applyGradient();
+          this.applyGradient(activeStoryContainer.nativeElement);
         }
 
       } catch (e) {
-        this.targetColors = this.storyService.getDefaultParsedColors(this.options);
+        this.targetColors = this.storyUtilityService.getDefaultParsedColors(this.options);
       }
     } else {
-      this.targetColors = this.storyService.getDefaultParsedColors(this.options);
+      this.targetColors = this.storyUtilityService.getDefaultParsedColors(this.options);
     }
   }
 
+  /**
+   * Starts a loop to update the background gradient based on the video content.
+   * Runs outside Angular to improve performance.
+   * @param videoElement The video element source.
+   */
   startVideoBackgroundUpdate(videoElement: HTMLVideoElement) {
     if (!this.options.enableGradientBackground) return;
     this.stopVideoBackgroundUpdate();
     let frameCount = 0;
 
-    const update = () => {
-      if (videoElement.paused || videoElement.ended) {
-        this.stopVideoBackgroundUpdate();
-        return;
-      }
+    // Cache the story container element to avoid re-querying active container every frame
+    const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex];
+    const containerNativeElement = activeStoryContainer?.nativeElement;
 
-      // 1. Update Target Colors (Throttled)
-      if (frameCount % 10 === 0) {
-        this.updateBackground(); // This updates this.targetColors
-      }
+    if (!containerNativeElement) return;
 
-      // 2. Interpolate Current Colors towards Target Colors (Every Frame)
-      // Factor 0.05 for very smooth, slow transition. 0.1 for faster.
-      const factor = 0.05;
-      this.currentColors = [
-        this.storyService.lerpColor(this.currentColors[0], this.targetColors[0], factor),
-        this.storyService.lerpColor(this.currentColors[1], this.targetColors[1], factor)
-      ];
+    this.ngZone.runOutsideAngular(() => {
+      const update = () => {
+        if (videoElement.paused || videoElement.ended) {
+          this.stopVideoBackgroundUpdate();
+          return;
+        }
 
-      // 3. Apply to DOM
-      this.applyGradient();
+        // 1. Update Target Colors (Throttled every 30 frames for better performance)
+        if (frameCount % 30 === 0) {
+          // Pass videoElement to avoid querySelector overhead
+          this.updateBackground(videoElement); // This updates this.targetColors
+        }
 
-      frameCount++;
+        // 2. Interpolate Current Colors towards Target Colors (Every Frame)
+        // Factor 0.03 for smooth, optimized transition.
+        const factor = 0.03;
+        this.currentColors = [
+          this.storyUtilityService.lerpColor(this.currentColors[0], this.targetColors[0], factor),
+          this.storyUtilityService.lerpColor(this.currentColors[1], this.targetColors[1], factor)
+        ];
+
+        // 3. Apply to DOM
+        this.applyGradient(containerNativeElement);
+
+        frameCount++;
+        this.videoFrameId = requestAnimationFrame(update);
+      };
       this.videoFrameId = requestAnimationFrame(update);
-    };
-    this.videoFrameId = requestAnimationFrame(update);
+    });
   }
 
-  private applyGradient() {
+  private applyGradient(containerElement?: HTMLElement) {
     const c1 = `rgb(${Math.round(this.currentColors[0][0])}, ${Math.round(this.currentColors[0][1])}, ${Math.round(this.currentColors[0][2])})`;
     const c2 = `rgb(${Math.round(this.currentColors[1][0])}, ${Math.round(this.currentColors[1][1])}, ${Math.round(this.currentColors[1][2])})`;
     this.currentStoryBackground = `linear-gradient(to bottom, ${c1}, ${c2})`;
+
+    // Direct DOM manipulation to avoid change detection on every frame
+    if (containerElement) {
+      const backgroundEl = containerElement.querySelector('.story-style') as HTMLElement;
+      if (backgroundEl) {
+        backgroundEl.style.background = this.currentStoryBackground;
+      }
+    }
   }
 
   stopVideoBackgroundUpdate() {
@@ -556,15 +823,23 @@ export class NgxStoriesComponent implements AfterViewInit {
     }
   }
 
+  /**
+   * Analyzes the image/video source to extract dominant colors for the gradient background.
+   * @param source The HTMLImageElement or HTMLVideoElement to analyze.
+   * @returns An array of two color strings (rgb format).
+   */
   getDominantColors(source: HTMLImageElement | HTMLVideoElement): string[] {
     if (!this.canvas) {
       this.canvas = document.createElement('canvas');
       this.canvas.width = 50;
       this.canvas.height = 50;
-      this.context = this.canvas.getContext('2d');
+      // Optimize for frequent reads
+      this.context = this.canvas.getContext('2d', { willReadFrequently: true });
     }
 
-    if (!this.context) return [this.options.backlitColor || '#1b1b1b', this.options.backlitColor || '#1b1b1b'];
+    // Fallback if context is not available
+    const defaultColor = this.options.backlitColor || '#1b1b1b';
+    if (!this.context) return [defaultColor, defaultColor];
 
     try {
       this.context.drawImage(source, 0, 0, 50, 50);
@@ -578,14 +853,14 @@ export class NgxStoriesComponent implements AfterViewInit {
         const b = data[i + 2];
         const a = data[i + 3];
 
-        if (a < 128) continue; // Skip transparent
+        if (a < 128) continue; // Skip transparent pixels
 
         // Simple brightness check
         const brightness = (r + g + b) / 3;
-        // Exclude very dark colors (brightness < 40) to avoid black/near-black in gradients
+        // Exclude very dark colors (< 40) to avoid black/near-black
         if (brightness < 40) continue;
 
-        // Quantize to nearest 20 to group similar colors and reduce noise
+        // Quantize to nearest 20 to group similar colors
         const qR = Math.round(r / 20) * 20;
         const qG = Math.round(g / 20) * 20;
         const qB = Math.round(b / 20) * 20;
@@ -604,44 +879,8 @@ export class NgxStoriesComponent implements AfterViewInit {
       return [`rgb(${sortedColors[0]})`, `rgb(${sortedColors[1]})`];
 
     } catch (e) {
-      console.warn('Failed to extract gradient colors, using default background:', e);
-      return [this.options.backlitColor || '#1b1b1b', this.options.backlitColor || '#1b1b1b'];
+      console.warn('ngx-stories: Failed to extract gradient colors, using default background.', e);
+      return [defaultColor, defaultColor];
     }
   }
-
-
-  // When content is buffering/loading
-  onContentBuffering() {
-    this.isLoading = true;
-  }
-
-  // If there's an error loading content
-  onContentError() {
-    console.error('Error loading content');
-    this.isLoading = false;
-    this.isContentError = true;
-    this.cdr.detectChanges();
-    // Auto-advance after 5s even if error, so user isn't stuck
-    this.startProgressInterval(this.DEFAULT_STORY_DURATION);
-  }
-
-  toggleAudio() {
-    this.isAudioEnabled = !this.isAudioEnabled;
-    const activeStoryContainer = this.storyContainers.toArray()[this.currentStoryGroupIndex];
-    const activeStoryContent = activeStoryContainer?.nativeElement.querySelector('.story-content.active');
-    const videoElement: HTMLVideoElement | null = activeStoryContent?.querySelector('video');
-    if (videoElement) {
-      videoElement.muted = !this.isAudioEnabled;
-    }
-  }
-
-  // Detect user interaction on the document level
-  @HostListener('document:click', ['$event'])
-  onUserInteraction() {
-    if (!this.userInteracted) {
-      this.userInteracted = true;
-      this.isAudioEnabled = true;
-    }
-  }
-
 }
