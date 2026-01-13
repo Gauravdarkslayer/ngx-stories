@@ -1,0 +1,12 @@
+# Robots.txt for Ngx-Stories
+# Allow all search engines to crawl all content
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://ngx-stories.vercel.app/sitemap.xml
+
+# Crawl-delay (optional, helps prevent overloading)
+# User-agent: *
+# Crawl-delay: 1
